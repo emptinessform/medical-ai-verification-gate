@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom';
-import { IR, type L1Node } from '@sb/ir-schema';
+import { IR, IR_SCHEMA_VERSION, type L1Node } from '@sb/ir-schema';
 import { stablePath } from './stable-path.js';
 import { makeNodeId } from './node-id.js';
 import { inputDigest } from './input-digest.js';
@@ -12,7 +12,7 @@ interface LiftArgs {
   ruleSetPin: string;
 }
 
-const unmeasuredNumber = { value: null, measured: false };
+const unmeasured = () => ({ value: null, measured: false });
 
 export function liftHtml(args: LiftArgs) {
   const { html, tenantId, runId, scenarioId, ruleSetPin } = args;
@@ -49,21 +49,24 @@ export function liftHtml(args: LiftArgs) {
         ? { text: el.textContent.trim() }
         : {}),
       computed: {
-        contrast: unmeasuredNumber,
-        focusable: { value: null, measured: false },
-        tabOrder: unmeasuredNumber,
-        fontSizePx: unmeasuredNumber,
+        contrast: unmeasured(),
+        focusable: unmeasured(),
+        tabOrder: unmeasured(),
+        fontSizePx: unmeasured(),
       },
       children: childIds,
     };
     return id;
   }
 
-  const root = doc.body.firstElementChild!;
+  const root = doc.body.firstElementChild;
+  if (!root) {
+    throw new Error('liftHtml: input html contains no element node to lift');
+  }
   const rootId = visit(root);
 
   return IR.parse({
-    irSchemaVersion: '1.0.0',
+    irSchemaVersion: IR_SCHEMA_VERSION,
     tenantId,
     runId,
     inputDigest: inputDigest(html, ruleSetPin),

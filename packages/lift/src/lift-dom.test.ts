@@ -31,4 +31,8 @@ describe('liftHtml', () => {
     expect(ir.l3).toEqual([]);
     expect(ir.facts).toEqual([]);
   });
+
+  it('throws a clear error when the html has no element', () => {
+    expect(() => liftHtml({ ...args, html: '   ' })).toThrow(/no element/);
+  });
 });
