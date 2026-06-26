@@ -75,14 +75,21 @@ describe('mapAxeResults', () => {
     expect(facts[0].observed).toEqual({ ratio: 2, result: 'incomplete' });
   });
 
-  it('strips a non-deterministic stack trace from observed but keeps other fields', () => {
+  it('reduces an engine-error blob (has stack) in observed to a stable marker', () => {
     const d = doc('<form><button id="b">저장</button></form>');
     const facts = mapAxeResults({ violations: [], incomplete: [
       { id: 'color-contrast', impact: null, nodes: [{ target: ['#b'], any: [{ data: {
-        message: 'Skipping color-contrast', stack: 'TypeError\n  at D:\\\\x\\\\axe.js:1:1' } }] }] },
+        name: 'TypeError', message: 'Cannot read ...', stack: 'TypeError\n  at D:\\\\x\\\\axe.js:1:1' } }] }] },
     ] }, d, opts);
-    expect(facts[0].observed).toEqual({ message: 'Skipping color-contrast', result: 'incomplete' });
-    expect('stack' in (facts[0].observed as object)).toBe(false);
+    expect(facts[0].observed).toEqual({ error: 'check-threw', result: 'incomplete' });
+  });
+
+  it('passes through clean (non-error) observed data unchanged', () => {
+    const d = doc('<form><input id="x"/></form>');
+    const facts = mapAxeResults({ violations: [
+      { id: 'label', impact: 'serious', nodes: [{ target: ['#x'], any: [{ data: { accessibleName: '' } }] }] },
+    ], incomplete: [] }, d, opts);
+    expect(facts[0].observed).toEqual({ accessibleName: '' });
   });
 
   it('preserves primitive check data by wrapping it', () => {

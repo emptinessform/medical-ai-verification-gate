@@ -25,11 +25,11 @@ function selectorOf(target: string | string[]): string {
 }
 
 function sanitizeObserved(data: Record<string, unknown>): Record<string, unknown> {
-  if (!('stack' in data)) return data;
-  // a stack trace carries absolute paths — non-deterministic and never audit evidence
-  const { stack: _stack, ...rest } = data;
-  void _stack;
-  return rest;
+  // axe puts a caught Error object into check data when a check throws (e.g. color-contrast
+  // in jsdom). Its message/name/stack/method are engine-version dependent — not audit evidence
+  // and not portable. Reduce the whole error blob to a stable marker.
+  if ('stack' in data) return { error: 'check-threw' };
+  return data;
 }
 
 function observedOf(node: AxeNode): Record<string, unknown> {

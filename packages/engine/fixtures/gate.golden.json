@@ -16,10 +16,7 @@
         "axeRuleId": "color-contrast",
         "impact": "serious",
         "observed": {
-          "message": "Cannot read properties of null (reading 'canvas') Skipping color-contrast rule.",
-          "name": "TypeError",
-          "ruleId": "color-contrast",
-          "method": "#matches",
+          "error": "check-threw",
           "result": "incomplete"
         }
       },
