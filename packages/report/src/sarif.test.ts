@@ -27,4 +27,26 @@ describe('toSarif', () => {
     const ruleMeta = sarif.runs[0].tool.driver.rules.find((r: any) => r.id === 'a11y.image-alt');
     expect(ruleMeta.helpUri).toBe('https://example/wcag/1.1.1');
   });
+  it('maps warn→warning and info→note, and omits helpUri when authority has no url', () => {
+    const noUrlAuth = { standard: 'WCAG 2.1', clause: '1.4.3' }; // no url
+    const r = buildReport({
+      findings: [
+        { ruleId: 'a11y.color-contrast', ruleVersion: '1.0.0', nodeId: 'l1:b', nodeStatus: 'unknown',
+          confidence: 1, severity: 'block', authority: noUrlAuth, evidence: {}, category: 'accessibility',
+          effectiveSeverity: 'warn', rolloutState: 'block', overridden: false },
+        { ruleId: 'a11y.note', ruleVersion: '1.0.0', nodeId: 'l1:c', nodeStatus: 'known',
+          confidence: 1, severity: 'info', authority: noUrlAuth, evidence: {}, category: 'accessibility',
+          effectiveSeverity: 'info', rolloutState: 'shadow', overridden: false },
+      ],
+      gate: { result: 'pass', blocking: [] },
+      runId: 'r', tenantId: 'hosp-A', inputDigest: 'sha256:x', ruleSetVersion: 'rs@1',
+      irSchemaVersion: '1.0.0', scenarios: ['empty'], generatedAt: '2026-06-26T00:00:00Z',
+    });
+    const sarif = toSarif(r) as any;
+    const byRule = Object.fromEntries(sarif.runs[0].results.map((x: any) => [x.ruleId, x.level]));
+    expect(byRule['a11y.color-contrast']).toBe('warning');
+    expect(byRule['a11y.note']).toBe('note');
+    const meta = sarif.runs[0].tool.driver.rules.find((x: any) => x.id === 'a11y.color-contrast');
+    expect('helpUri' in meta).toBe(false); // no url → key omitted
+  });
 });

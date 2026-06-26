@@ -36,4 +36,8 @@ describe('buildReport', () => {
     expect(report.schemaVersion).toBe('1.0.0');
     expect(ValidationReport.parse(report).ruleSetVersion).toBe('rs@1');
   });
+  it('counts ambiguous nodeStatus findings in unknownNodes', () => {
+    const report = buildReport({ ...base, findings: [f({ nodeStatus: 'ambiguous', effectiveSeverity: 'warn' })] });
+    expect(report.summary.unknownNodes).toBe(1);
+  });
 });

@@ -12,7 +12,7 @@ export function toSarif(report: ValidationReport): object {
     const sample = report.findings.find((f) => f.ruleId === id)!;
     return {
       id,
-      helpUri: sample.authority.url,
+      ...(sample.authority.url ? { helpUri: sample.authority.url } : {}),
       properties: { standard: sample.authority.standard, clause: sample.authority.clause },
     };
   });
