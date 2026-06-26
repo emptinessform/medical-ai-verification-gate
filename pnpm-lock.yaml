@@ -20,6 +20,19 @@ importers:
       '@sb/ir-schema':
         specifier: workspace:*
         version: link:../ir-schema
+    devDependencies:
+      '@sb/lift':
+        specifier: workspace:*
+        version: link:../lift
+      '@sb/normalize':
+        specifier: workspace:*
+        version: link:../normalize
+      '@sb/promoter':
+        specifier: workspace:*
+        version: link:../promoter
+      '@sb/rules':
+        specifier: workspace:*
+        version: link:../rules
 
   packages/ir-schema:
     dependencies:

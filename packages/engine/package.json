@@ -5,5 +5,11 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@sb/ir-schema": "workspace:*"
+  },
+  "devDependencies": {
+    "@sb/lift": "workspace:*",
+    "@sb/promoter": "workspace:*",
+    "@sb/normalize": "workspace:*",
+    "@sb/rules": "workspace:*"
   }
 }

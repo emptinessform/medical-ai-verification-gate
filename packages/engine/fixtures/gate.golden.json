@@ -1,0 +1,89 @@
+{
+  "findings": [
+    {
+      "ruleId": "a11y.color-contrast",
+      "ruleVersion": "1.0.0",
+      "nodeId": "l1:e0b998b31ebf",
+      "nodeStatus": "unknown",
+      "confidence": 1,
+      "severity": "block",
+      "authority": {
+        "standard": "WCAG 2.1",
+        "clause": "1.4.3",
+        "url": "https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum"
+      },
+      "evidence": {
+        "axeRuleId": "color-contrast",
+        "impact": "serious",
+        "observed": {
+          "message": "Cannot read properties of null (reading 'canvas') Skipping color-contrast rule.",
+          "stack": "TypeError: Cannot read properties of null (reading 'canvas')\n    at _isIconLigature (D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:16727:34)\n    at D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28288:54\n    at Array.some (<anonymous>)\n    at hasRealTextChildren (D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28287:35)\n    at Rule.colorContrastMatches [as matches] (D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28249:12)\n    at D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28924:26\n    at Array.filter (<anonymous>)\n    at Rule.gatherAndMatchNodes (D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28922:21)\n    at Rule.run2 [as run] (D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:28782:22)\n    at D:\\sb\\study\\sbmc\\node_modules\\.pnpm\\axe-core@4.12.1\\node_modules\\axe-core\\axe.js:29501:14",
+          "name": "TypeError",
+          "ruleId": "color-contrast",
+          "method": "#matches",
+          "result": "incomplete"
+        }
+      },
+      "category": "accessibility",
+      "effectiveSeverity": "warn",
+      "rolloutState": "block",
+      "overridden": false
+    },
+    {
+      "ruleId": "a11y.image-alt",
+      "ruleVersion": "1.0.0",
+      "nodeId": "l1:3a48247889fb",
+      "nodeStatus": "known",
+      "confidence": 1,
+      "severity": "block",
+      "authority": {
+        "standard": "WCAG 2.1",
+        "clause": "1.1.1",
+        "url": "https://www.w3.org/WAI/WCAG21/Understanding/non-text-content"
+      },
+      "evidence": {
+        "axeRuleId": "image-alt",
+        "impact": "critical",
+        "observed": {
+          "messageKey": "noAttr"
+        }
+      },
+      "category": "accessibility",
+      "effectiveSeverity": "block",
+      "rolloutState": "block",
+      "overridden": false
+    },
+    {
+      "ruleId": "a11y.input-label",
+      "ruleVersion": "1.0.0",
+      "nodeId": "l1:c77df70c0019",
+      "nodeStatus": "known",
+      "confidence": 1,
+      "severity": "block",
+      "authority": {
+        "standard": "WCAG 2.1",
+        "clause": "4.1.2",
+        "url": "https://www.w3.org/WAI/WCAG21/Understanding/name-role-value"
+      },
+      "evidence": {
+        "axeRuleId": "label",
+        "impact": "critical",
+        "observed": {
+          "messageKey": "noAttr"
+        }
+      },
+      "category": "accessibility",
+      "effectiveSeverity": "block",
+      "rolloutState": "block",
+      "overridden": false
+    }
+  ],
+  "gate": {
+    "result": "block",
+    "blocking": [
+      "a11y.image-alt",
+      "a11y.input-label"
+    ]
+  },
+  "exit": 1
+}
