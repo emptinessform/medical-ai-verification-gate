@@ -49,4 +49,7 @@ describe('resolveBinding', () => {
   it('returns undefined when no binding source exists', () => {
     expect(resolveBinding(n('l1:i', 'input', {}))).toBeUndefined();
   });
+  it('falls through an empty name to data-bind', () => {
+    expect(resolveBinding(n('l1:i', 'input', { name: '', 'data-bind': 'order.qty' }))?.path).toBe('order.qty');
+  });
 });

@@ -20,14 +20,13 @@ export function resolveActionRole(
     return { role: 'submit', confidence: 0.85, ambiguous: false };
   }
   const text = (action.text ?? '').toLowerCase();
-  const raw = action.text ?? '';
-  if (DESTRUCTIVE.some((w) => raw.includes(w) || text.includes(w))) {
+  if (DESTRUCTIVE.some((w) => text.includes(w))) {
     return { role: 'destructive', confidence: 0.7, ambiguous: false };
   }
-  if (CANCEL.some((w) => raw.includes(w) || text.includes(w))) {
+  if (CANCEL.some((w) => text.includes(w))) {
     return { role: 'cancel', confidence: 0.7, ambiguous: false };
   }
-  if (SUBMIT.some((w) => raw.includes(w) || text.includes(w))) {
+  if (SUBMIT.some((w) => text.includes(w))) {
     return { role: 'submit', confidence: 0.7, ambiguous: false };
   }
   // sole button in its form → submit (0.85)
