@@ -7,6 +7,7 @@
     { "path": "packages/promoter" },
     { "path": "packages/normalize" },
     { "path": "packages/engine" },
-    { "path": "packages/rules" }
+    { "path": "packages/rules" },
+    { "path": "packages/cli" }
   ]
 }

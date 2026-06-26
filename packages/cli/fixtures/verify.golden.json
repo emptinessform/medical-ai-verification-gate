@@ -1,0 +1,104 @@
+{
+  "report": {
+    "schemaVersion": "1.0.0",
+    "runId": "r",
+    "tenantId": "hosp-A",
+    "inputDigest": "sha256:5738744f5e49ddc8f6c9c53474bd69bd575afb0342df69458e37a51ae079a474",
+    "ruleSetVersion": "rs@1",
+    "irSchemaVersion": "1.0.0",
+    "gate": {
+      "result": "block",
+      "blocking": [
+        "a11y.image-alt",
+        "a11y.input-label"
+      ]
+    },
+    "findings": [
+      {
+        "ruleId": "a11y.color-contrast",
+        "ruleVersion": "1.0.0",
+        "nodeId": "l1:e0b998b31ebf",
+        "nodeStatus": "unknown",
+        "confidence": 1,
+        "severity": "block",
+        "authority": {
+          "standard": "WCAG 2.1",
+          "clause": "1.4.3",
+          "url": "https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum"
+        },
+        "evidence": {
+          "axeRuleId": "color-contrast",
+          "impact": "serious",
+          "observed": {
+            "error": "check-threw",
+            "result": "incomplete"
+          }
+        },
+        "category": "accessibility",
+        "effectiveSeverity": "warn",
+        "rolloutState": "block",
+        "overridden": false
+      },
+      {
+        "ruleId": "a11y.image-alt",
+        "ruleVersion": "1.0.0",
+        "nodeId": "l1:3a48247889fb",
+        "nodeStatus": "known",
+        "confidence": 1,
+        "severity": "block",
+        "authority": {
+          "standard": "WCAG 2.1",
+          "clause": "1.1.1",
+          "url": "https://www.w3.org/WAI/WCAG21/Understanding/non-text-content"
+        },
+        "evidence": {
+          "axeRuleId": "image-alt",
+          "impact": "critical",
+          "observed": {
+            "messageKey": "noAttr"
+          }
+        },
+        "category": "accessibility",
+        "effectiveSeverity": "block",
+        "rolloutState": "block",
+        "overridden": false
+      },
+      {
+        "ruleId": "a11y.input-label",
+        "ruleVersion": "1.0.0",
+        "nodeId": "l1:c77df70c0019",
+        "nodeStatus": "known",
+        "confidence": 1,
+        "severity": "block",
+        "authority": {
+          "standard": "WCAG 2.1",
+          "clause": "4.1.2",
+          "url": "https://www.w3.org/WAI/WCAG21/Understanding/name-role-value"
+        },
+        "evidence": {
+          "axeRuleId": "label",
+          "impact": "critical",
+          "observed": {
+            "messageKey": "noAttr"
+          }
+        },
+        "category": "accessibility",
+        "effectiveSeverity": "block",
+        "rolloutState": "block",
+        "overridden": false
+      }
+    ],
+    "summary": {
+      "block": 2,
+      "warn": 1,
+      "info": 0,
+      "unknownNodes": 1,
+      "coverageGaps": 0,
+      "scenarios": [
+        "empty"
+      ]
+    },
+    "generatedAt": "2026-06-26T00:00:00Z"
+  },
+  "exitCode": 1
+}

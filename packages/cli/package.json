@@ -1,0 +1,16 @@
+{
+  "name": "@sb/cli",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": { "softbowl": "./src/bin.ts" },
+  "dependencies": {
+    "@sb/ir-schema": "workspace:*",
+    "@sb/lift": "workspace:*",
+    "@sb/normalize": "workspace:*",
+    "@sb/promoter": "workspace:*",
+    "@sb/rules": "workspace:*",
+    "@sb/engine": "workspace:*",
+    "@sb/report": "workspace:*"
+  }
+}

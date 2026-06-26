@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "dist" },
+  "references": [
+    { "path": "../ir-schema" }, { "path": "../lift" }, { "path": "../normalize" },
+    { "path": "../promoter" }, { "path": "../rules" }, { "path": "../engine" }, { "path": "../report" }
+  ],
+  "include": ["src"]
+}

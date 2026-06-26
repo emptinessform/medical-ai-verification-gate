@@ -15,6 +15,30 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@26.0.1)(jsdom@24.1.3)
 
+  packages/cli:
+    dependencies:
+      '@sb/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@sb/ir-schema':
+        specifier: workspace:*
+        version: link:../ir-schema
+      '@sb/lift':
+        specifier: workspace:*
+        version: link:../lift
+      '@sb/normalize':
+        specifier: workspace:*
+        version: link:../normalize
+      '@sb/promoter':
+        specifier: workspace:*
+        version: link:../promoter
+      '@sb/report':
+        specifier: workspace:*
+        version: link:../report
+      '@sb/rules':
+        specifier: workspace:*
+        version: link:../rules
+
   packages/engine:
     dependencies:
       '@sb/ir-schema':
