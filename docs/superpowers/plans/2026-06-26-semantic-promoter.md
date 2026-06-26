@@ -1,45 +1,45 @@
-# Semantic Promoter (L1 → L2) Implementation Plan
+# Semantic Promoter (L1 → L2) 구현 플랜
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build `@sb/promoter` — the L1→L2 Semantic Promoter that infers form/field/action/binding semantics from the structural L1 IR, emitting `confidence` and `status` on every inference (the architecture's #1 long-pole risk, §3.5).
+**목표:** `@sb/promoter` 구축 — 구조적 L1 IR로부터 폼/필드/액션/바인딩 시맨틱을 추론하는 L1→L2 Semantic Promoter. 모든 추론에 `confidence`와 `status`를 부여한다 (아키텍처가 지목한 1순위 롱폴 리스크, §3.5).
 
-**Architecture:** A pure function `promote({ l1, facts, tenantId, hook })` walks the L1 StructureGraph and produces an `L2Overlay[]` of `Form`/`Field`/`Action`/`Display` nodes. Each L2 node derives its deterministic `nodeId` from the L1 node it covers (using that L1 node's stablePath as seed, per §3.2.1) and carries `derivedFrom`. Every inference that is uncertain MUST be recorded as `'unknown'`/`status:'ambiguous'` with lowered `confidence` — never guessed as a definite value (P5/P6). facts (axe results) are accepted for cross-checking label absence but may be empty in this slice (NORMALIZE is a later plan).
+**아키텍처:** 순수 함수 `promote({ l1, facts, tenantId, hook })`가 L1 StructureGraph를 순회해 `Form`/`Field`/`Action`/`Display` 노드의 `L2Overlay[]`를 생성한다. 각 L2 노드는 자신이 덮는 L1 노드로부터 결정적 `nodeId`를 파생하고(§3.2.1대로 그 L1 노드의 stablePath를 시드로 사용), `derivedFrom`를 단다. 추론이 불확실하면 반드시 `'unknown'`/`status:'ambiguous'`로 기록하고 `confidence`를 낮춘다 — 절대 확정값으로 단정하지 않는다(P5/P6). facts(axe 결과)는 label 부재 교차검증을 위해 입력으로 받지만, 이 슬라이스에서는 비어 있을 수 있다(NORMALIZE는 후속 플랜).
 
-**Tech Stack:** TypeScript(strict), pnpm workspace, Vitest, Zod. New package `@sb/promoter` depends on `@sb/ir-schema` (types) and `@sb/lift` (`makeNodeId`).
+**기술 스택:** TypeScript(strict), pnpm workspace, Vitest, Zod. 새 패키지 `@sb/promoter`는 `@sb/ir-schema`(타입)와 `@sb/lift`(`makeNodeId`)에 의존한다.
 
-## Global Constraints
+## 전역 제약 (Global Constraints)
 
-- TypeScript `strict: true`. `@sb/promoter` imports IR types only from `@sb/ir-schema` and `makeNodeId`/`SEP` only from `@sb/lift`.
-- `unknown ≠ null`: any inference the heuristics cannot resolve MUST be `'unknown'` (for `required`/`dataType`/`Action.role`) with the L2 node's `status: 'ambiguous'` and lowered `confidence`. Do NOT default uncertain values to a definite one.
-  - The SINGLE deliberate exception: `Field.label` is `string | null` where `null` means **confirmed absent** (status stays `known`), per §3.5. This is a known value, not an unknown.
-- Deterministic L2 `nodeId`: for an L2 node covering L1 node `n`, `nodeId = makeNodeId('l2', tenantId, n.provenance.source.domPath)` (the L1 node's stablePath is stored in `provenance.source.domPath`). `derivedFrom = [n.nodeId]`. No randomness.
-- L2 node `confidence`/`status` aggregation (deterministic): `status` is `'ambiguous'` if ANY of the node's resolved core signals (`required`, `dataType`, `Action.role`) is `'unknown'`/ambiguous; else `'known'`. `confidence` is the MINIMUM confidence across the signals that contributed (most conservative). A Form node with all-known children is `confidence: 0.95, status: 'known'`.
-- Confidence values come verbatim from §3.5 (e.g. field-kind 0.95, label-for 0.95, aria-label 0.9, adjacent-text 0.6, dataType direct 0.9, action submit 0.85, action dict 0.7, binding 0.8).
-- Determinism: walking L1 nodes in sorted `nodeId` order; same L1 → same L2 (golden snapshot guards this).
-- Commit at the end of each task with a conventional-commit message.
+- TypeScript `strict: true`. `@sb/promoter`는 IR 타입을 `@sb/ir-schema`에서만, `makeNodeId`/`SEP`를 `@sb/lift`에서만 import한다.
+- `unknown ≠ null`: 휴리스틱이 풀지 못한 추론(`required`/`dataType`/`Action.role`)은 반드시 `'unknown'`으로 두고 L2 노드 `status: 'ambiguous'` + 낮춘 `confidence`로 표기한다. 불확실값을 확정값으로 디폴트하지 않는다.
+  - 단 하나의 의도적 예외: `Field.label`은 `string | null`이며 `null`은 **확정 부재**를 뜻한다(status는 `known` 유지), §3.5대로. 이는 미상이 아니라 known 값이다.
+- 결정적 L2 `nodeId`: L1 노드 `n`을 덮는 L2 노드는 `nodeId = makeNodeId('l2', tenantId, n.provenance.source.domPath)`(L1 노드의 stablePath가 `provenance.source.domPath`에 저장됨). `derivedFrom = [n.nodeId]`. 무작위 금지.
+- L2 노드 `confidence`/`status` 집계(결정적): 노드의 핵심 신호(`required`, `dataType`, `Action.role`) 중 하나라도 `'unknown'`/ambiguous면 `status`는 `'ambiguous'`, 아니면 `'known'`. `confidence`는 기여한 신호들의 **최솟값**(가장 보수적). 모든 자식이 known인 Form 노드는 `confidence: 0.95, status: 'known'`.
+- confidence 값은 §3.5에서 그대로 가져온다(예: 필드 식별 0.95, label-for 0.95, aria-label 0.9, 인접텍스트 0.6, dataType 직매핑 0.9, action submit 0.85, action 사전 0.7, binding 0.8).
+- 결정성: L1 노드를 정렬된 `nodeId` 순으로 순회 → 같은 L1 → 같은 L2(골든 스냅샷이 보증).
+- 각 태스크 끝에서 conventional-commit 메시지로 커밋.
 
 ---
 
-### Task 1: L2 / facts / binding contract types in `@sb/ir-schema`
+### Task 1: `@sb/ir-schema`에 L2 / facts / binding 계약 타입
 
 **Files:**
 - Create: `packages/ir-schema/src/l2.ts`
 - Create: `packages/ir-schema/src/facts.ts`
-- Modify: `packages/ir-schema/src/ir.ts` (tighten `l2`/`facts` from `z.array(z.unknown())`)
-- Modify: `packages/ir-schema/src/index.ts` (append exports)
+- Modify: `packages/ir-schema/src/ir.ts` (`l2`/`facts`를 `z.array(z.unknown())`에서 tighten)
+- Modify: `packages/ir-schema/src/index.ts` (export 추가)
 - Test: `packages/ir-schema/src/l2.test.ts`
 
 **Interfaces:**
-- Consumes: `node-meta.ts` (`NodeMeta`), `scalars.ts` (`TriBool`)
+- Consumes: `node-meta.ts`(`NodeMeta`), `scalars.ts`(`TriBool`)
 - Produces:
   - `CaptureKind` = `'runtime-dom' | 'declarative' | 'source-ast'`
-  - `ExternalFact` (Zod) = `{ engine, ruleId, appliesTo, impact: 'minor'|'moderate'|'serious'|'critical', measurable, observed: Record<string,unknown>, scenarioId }`
-  - `BindingDescriptor` (Zod) = `{ scope: 'ui-internal'|'contract', path, observedType?, unit?, codeSystem?, contract? }` (see code)
-  - `L2Overlay` (Zod discriminated union on `kind`) of `Form | Field | Action | Display`, each `NodeMeta & {...}`
-  - Tightened `IR.l2: L2Overlay[]`, `IR.facts: ExternalFact[]`
+  - `ExternalFact`(Zod) = `{ engine, ruleId, appliesTo, impact: 'minor'|'moderate'|'serious'|'critical', measurable, observed: Record<string,unknown>, scenarioId }`
+  - `BindingDescriptor`(Zod) = `{ scope: 'ui-internal'|'contract', path, observedType?, unit?, codeSystem?, contract? }` (코드 참조)
+  - `L2Overlay`(`kind` 기준 Zod discriminated union) = `Form | Field | Action | Display`, 각각 `NodeMeta & {...}`
+  - tighten된 `IR.l2: L2Overlay[]`, `IR.facts: ExternalFact[]`
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: 실패 테스트 작성**
 
 `packages/ir-schema/src/l2.test.ts`:
 ```ts
@@ -91,12 +91,12 @@ describe('BindingDescriptor', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: 실패 확인**
 
 Run: `pnpm vitest run packages/ir-schema/src/l2.test.ts`
 Expected: FAIL ("Cannot find module './l2.js'")
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: 최소 구현 작성**
 
 `packages/ir-schema/src/facts.ts`:
 ```ts
@@ -175,41 +175,41 @@ export const L2Overlay = z.discriminatedUnion('kind', [L2Form, L2Field, L2Action
 export type L2Overlay = z.infer<typeof L2Overlay>;
 ```
 
-Modify `packages/ir-schema/src/ir.ts` — tighten the two arrays. Change:
+`packages/ir-schema/src/ir.ts` 수정 — 두 배열을 tighten. 다음을:
 ```ts
   l2: z.array(z.unknown()), // 후속 플랜: SemanticOverlay
   ...
   facts: z.array(z.unknown()), // 후속 플랜: ExternalFact (NORMALIZE)
 ```
-to:
+다음으로 변경:
 ```ts
   l2: z.array(L2Overlay),
   ...
   facts: z.array(ExternalFact),
 ```
-and add the imports at the top of `ir.ts` (direct submodule imports to avoid cycles):
+그리고 `ir.ts` 상단에 import 추가(순환 회피를 위해 서브모듈 직접 import):
 ```ts
 import { L2Overlay } from './l2.js';
 import { ExternalFact } from './facts.js';
 ```
 
-- [ ] **Step 4: index re-export + run test**
+- [ ] **Step 4: index 재노출 + 테스트 실행**
 
-Append to `packages/ir-schema/src/index.ts`:
+`packages/ir-schema/src/index.ts`에 추가:
 ```ts
 export * from './l2.js';
 ```
-(`l2.js` already re-exports `facts.js`, so `ExternalFact`/`CaptureKind` come through it. Do not add a second `facts.js` export line.)
+(`l2.js`가 이미 `facts.js`를 재노출하므로 `ExternalFact`/`CaptureKind`는 이를 통해 나온다. facts export 라인을 따로 추가하지 말 것.)
 
 Run: `pnpm vitest run packages/ir-schema/src/l2.test.ts`
 Expected: PASS (6 tests)
 
-- [ ] **Step 5: Confirm existing IR tests still pass (l2/facts now tightened but empty arrays still valid)**
+- [ ] **Step 5: 기존 IR 테스트가 여전히 통과하는지 확인 (l2/facts tighten했지만 빈 배열은 유효)**
 
 Run: `pnpm vitest run packages/ir-schema/ packages/lift/src/determinism.test.ts`
-Expected: PASS (existing IR + lift tests unaffected — `liftHtml` emits `l2:[], facts:[]` which satisfy the tightened arrays)
+Expected: PASS (기존 IR + lift 테스트 영향 없음 — `liftHtml`은 tighten된 배열을 만족하는 `l2:[], facts:[]`를 방출)
 
-- [ ] **Step 6: Typecheck + Commit**
+- [ ] **Step 6: 타입체크 + 커밋**
 
 Run: `pnpm typecheck`
 Expected: exit 0
@@ -221,23 +221,23 @@ git commit -m "feat(ir-schema): add L2Overlay, ExternalFact, BindingDescriptor a
 
 ---
 
-### Task 2: `@sb/promoter` scaffold + node classification + L2 nodeId derivation
+### Task 2: `@sb/promoter` 스캐폴드 + 노드 분류 + L2 nodeId 파생
 
 **Files:**
 - Create: `packages/promoter/package.json`
 - Create: `packages/promoter/tsconfig.json`
 - Create: `packages/promoter/src/classify.ts`
 - Create: `packages/promoter/src/l2-id.ts`
-- Modify: `tsconfig.json` (root — add `packages/promoter` reference)
+- Modify: `tsconfig.json` (루트 — `packages/promoter` 참조 추가)
 - Test: `packages/promoter/src/classify.test.ts`
 
 **Interfaces:**
-- Consumes: `@sb/ir-schema` (`L1Node`, `L1Graph` types), `@sb/lift` (`makeNodeId`)
+- Consumes: `@sb/ir-schema`(`L1Node`, `L1Graph` 타입), `@sb/lift`(`makeNodeId`)
 - Produces:
   - `classifyNode(node: L1Node): 'Form' | 'Field' | 'Action' | 'Display' | null`
-  - `l2IdFor(tenantId: string, l1: L1Node): string` → `makeNodeId('l2', tenantId, l1.provenance.source.domPath)` (reads the L1 node's stablePath from provenance; if provenance.source has no `domPath`, throw — L1 from `liftHtml` always uses domPath)
+  - `l2IdFor(tenantId: string, l1: L1Node): string` → `makeNodeId('l2', tenantId, l1.provenance.source.domPath)` (L1 노드의 stablePath를 provenance에서 읽음; `provenance.source`에 `domPath`가 없으면 throw — `liftHtml`의 L1은 항상 domPath 사용)
 
-- [ ] **Step 1: Create package files + failing test**
+- [ ] **Step 1: 패키지 파일 + 실패 테스트 작성**
 
 `packages/promoter/package.json`:
 ```json
@@ -263,7 +263,7 @@ git commit -m "feat(ir-schema): add L2Overlay, ExternalFact, BindingDescriptor a
 }
 ```
 
-Add `{ "path": "packages/promoter" }` to the `references` array in the root `tsconfig.json`.
+루트 `tsconfig.json`의 `references` 배열에 `{ "path": "packages/promoter" }` 추가.
 
 `packages/promoter/src/classify.test.ts`:
 ```ts
@@ -311,12 +311,12 @@ describe('l2IdFor', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: 실패 확인**
 
 Run: `pnpm install && pnpm vitest run packages/promoter/src/classify.test.ts`
 Expected: FAIL ("Cannot find module './classify.js'")
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: 최소 구현 작성**
 
 `packages/promoter/src/classify.ts`:
 ```ts
@@ -354,14 +354,14 @@ export function l2IdFor(tenantId: string, l1: L1Node): string {
 }
 ```
 
-- [ ] **Step 4: Run test + typecheck**
+- [ ] **Step 4: 테스트 + 타입체크**
 
 Run: `pnpm vitest run packages/promoter/src/classify.test.ts`
 Expected: PASS (6 tests)
 Run: `pnpm typecheck`
 Expected: exit 0
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add packages/promoter/ tsconfig.json pnpm-lock.yaml
@@ -370,22 +370,22 @@ git commit -m "feat(promoter): scaffold @sb/promoter with node classification an
 
 ---
 
-### Task 3: Field semantics — label, required, dataType heuristics
+### Task 3: 필드 시맨틱 — label, required, dataType 휴리스틱
 
 **Files:**
 - Create: `packages/promoter/src/promote-field.ts`
 - Test: `packages/promoter/src/promote-field.test.ts`
 
 **Interfaces:**
-- Consumes: `classify.ts`, `l2-id.ts`, `@sb/ir-schema` (`L1Node`, `L1Graph`, `ExternalFact`, `TriBool`, `BindingDescriptor` types)
+- Consumes: `classify.ts`, `l2-id.ts`, `@sb/ir-schema`(`L1Node`, `L1Graph`, `ExternalFact`, `TriBool`, `BindingDescriptor` 타입)
 - Produces:
   - `resolveLabel(field: L1Node, l1: L1Graph): { label: string | null; confidence: number; ambiguous: boolean }`
   - `resolveRequired(field: L1Node, label: string | null): { required: TriBool; confidence: number; ambiguous: boolean }`
   - `resolveDataType(field: L1Node): { dataType: string; confidence: number; ambiguous: boolean }`
 
-Heuristics are exactly §3.5. `ambiguous: true` means this signal forces the L2 node status to `'ambiguous'`.
+휴리스틱은 정확히 §3.5. `ambiguous: true`는 이 신호가 L2 노드 status를 `'ambiguous'`로 강제함을 뜻한다.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: 실패 테스트 작성**
 
 `packages/promoter/src/promote-field.test.ts`:
 ```ts
@@ -459,12 +459,12 @@ describe('resolveDataType', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: 실패 확인**
 
 Run: `pnpm vitest run packages/promoter/src/promote-field.test.ts`
 Expected: FAIL ("Cannot find module './promote-field.js'")
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: 최소 구현 작성**
 
 `packages/promoter/src/promote-field.ts`:
 ```ts
@@ -536,12 +536,12 @@ export function resolveDataType(
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: 통과 확인**
 
 Run: `pnpm vitest run packages/promoter/src/promote-field.test.ts`
 Expected: PASS (11 tests)
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add packages/promoter/src/promote-field.ts packages/promoter/src/promote-field.test.ts
@@ -558,12 +558,12 @@ git commit -m "feat(promoter): add label/required/dataType field heuristics with
 - Test: `packages/promoter/src/promote-action.test.ts`
 
 **Interfaces:**
-- Consumes: `@sb/ir-schema` (`L1Node`, `L1Graph`, `BindingDescriptor` types)
+- Consumes: `@sb/ir-schema`(`L1Node`, `L1Graph`, `BindingDescriptor` 타입)
 - Produces:
   - `resolveActionRole(action: L1Node, l1: L1Graph): { role: 'submit'|'cancel'|'destructive'|'navigate'|'unknown'; confidence: number; ambiguous: boolean }`
-  - `resolveBinding(node: L1Node): BindingDescriptor | undefined` — from `name`/`data-bind`/`id` (0.8), else undefined
+  - `resolveBinding(node: L1Node): BindingDescriptor | undefined` — `name`/`data-bind`/`id`에서(0.8), 없으면 undefined
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: 실패 테스트 작성**
 
 `packages/promoter/src/promote-action.test.ts`:
 ```ts
@@ -621,12 +621,12 @@ describe('resolveBinding', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: 실패 확인**
 
 Run: `pnpm vitest run packages/promoter/src/promote-action.test.ts`
 Expected: FAIL ("Cannot find module './promote-action.js'")
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: 최소 구현 작성**
 
 `packages/promoter/src/binding.ts`:
 ```ts
@@ -688,14 +688,14 @@ export function resolveActionRole(
 }
 ```
 
-> Note on test "sole button in a form" (button text "처방 저장"): both the text dictionary ("처방"/"저장") and the sole-button rule yield `submit`. The dictionary check runs first and returns `submit` at 0.7 — the test only asserts `.role === 'submit'`, so either path satisfies it.
+> 테스트 "sole button in a form"(버튼 텍스트 "처방 저장") 관련 주의: 텍스트 사전("처방"/"저장")과 단독버튼 규칙 둘 다 `submit`을 낸다. 사전 검사가 먼저 돌아 0.7로 `submit`을 반환 — 테스트는 `.role === 'submit'`만 단언하므로 어느 경로든 만족한다.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 4: 통과 확인**
 
 Run: `pnpm vitest run packages/promoter/src/promote-action.test.ts`
 Expected: PASS (7 tests)
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add packages/promoter/src/promote-action.ts packages/promoter/src/binding.ts packages/promoter/src/promote-action.test.ts
@@ -704,7 +704,7 @@ git commit -m "feat(promoter): add Action role inference and binding.path extrac
 
 ---
 
-### Task 5: `promote()` orchestration — assemble L2 graph
+### Task 5: `promote()` 오케스트레이션 — L2 그래프 조립
 
 **Files:**
 - Create: `packages/promoter/src/promote.ts`
@@ -712,13 +712,13 @@ git commit -m "feat(promoter): add Action role inference and binding.path extrac
 - Test: `packages/promoter/src/promote.test.ts`
 
 **Interfaces:**
-- Consumes: `classify.ts`, `l2-id.ts`, `promote-field.ts`, `promote-action.ts`, `binding.ts`, `@sb/ir-schema` (`L1Graph`, `L2Overlay`, `ExternalFact`, `CaptureKind`, `NodeStatus` types)
+- Consumes: `classify.ts`, `l2-id.ts`, `promote-field.ts`, `promote-action.ts`, `binding.ts`, `@sb/ir-schema`(`L1Graph`, `L2Overlay`, `ExternalFact`, `CaptureKind`, `NodeStatus` 타입)
 - Produces:
   - `interface PromoterHook { captureKind: CaptureKind }`
   - `promote(args: { l1: L1Graph; facts: ExternalFact[]; tenantId: string; hook: PromoterHook }): L2Overlay[]`
-  - Aggregation: an L2 node's `status` is `'ambiguous'` if any contributing signal was ambiguous, else `'known'`; `confidence` is the MINIMUM contributing confidence. Field-kind base confidence is 0.95. Walks L1 nodes in sorted nodeId order for determinism. A Form's `fields`/`actions` hold the l2 nodeIds of its Field/Action descendants.
+  - 집계: L2 노드 `status`는 기여 신호 중 하나라도 ambiguous면 `'ambiguous'`, 아니면 `'known'`; `confidence`는 기여 신호 confidence의 최솟값. 필드 식별 기본 confidence는 0.95. 결정성을 위해 L1 노드를 정렬된 nodeId 순으로 순회. Form의 `fields`/`actions`는 그 후손 Field/Action의 l2 nodeId를 담는다.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: 실패 테스트 작성**
 
 `packages/promoter/src/promote.test.ts`:
 ```ts
@@ -775,12 +775,12 @@ describe('promote', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: 실패 확인**
 
 Run: `pnpm vitest run packages/promoter/src/promote.test.ts`
 Expected: FAIL ("Cannot find module './promote.js'")
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: 최소 구현 작성**
 
 `packages/promoter/src/promote.ts`:
 ```ts
@@ -883,14 +883,14 @@ export * from './binding.js';
 export * from './promote.js';
 ```
 
-- [ ] **Step 4: Run test + typecheck**
+- [ ] **Step 4: 테스트 + 타입체크**
 
 Run: `pnpm vitest run packages/promoter/src/promote.test.ts`
 Expected: PASS (5 tests)
 Run: `pnpm typecheck`
 Expected: exit 0
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add packages/promoter/src/promote.ts packages/promoter/src/index.ts packages/promoter/src/promote.test.ts
@@ -899,17 +899,17 @@ git commit -m "feat(promoter): assemble L1->L2 overlay with deterministic ids an
 
 ---
 
-### Task 6: Determinism golden for L1→L2 + full integration
+### Task 6: L1→L2 결정성 골든 + 전체 통합
 
 **Files:**
 - Create: `packages/promoter/src/determinism.test.ts`
 - Create: `packages/promoter/fixtures/prescription-l2.golden.json`
 
 **Interfaces:**
-- Consumes: `@sb/lift` (`liftHtml`), `promote.ts`
-- Produces: (tests only — the L2 regression baseline)
+- Consumes: `@sb/lift`(`liftHtml`), `promote.ts`
+- Produces: (테스트만 — L2 회귀 기준선)
 
-- [ ] **Step 1: Write the determinism test**
+- [ ] **Step 1: 결정성 테스트 작성**
 
 `packages/promoter/src/determinism.test.ts`:
 ```ts
@@ -955,27 +955,27 @@ describe('promoter determinism', () => {
 });
 ```
 
-- [ ] **Step 2: Run test (generates golden, then passes)**
+- [ ] **Step 2: 테스트 실행 (골든 생성 후 통과)**
 
 Run: `pnpm vitest run packages/promoter/src/determinism.test.ts`
-Expected: golden file generated on first run, then PASS (3 tests). Run a SECOND time → still PASS.
+Expected: 최초 실행에서 골든 파일 생성 후 PASS (3 tests). 두 번째 실행에서도 PASS.
 
-- [ ] **Step 3: Sanity-check the golden**
+- [ ] **Step 3: 골든 육안 검토**
 
-Open `packages/promoter/fixtures/prescription-l2.golden.json`:
-- One `Form`, two `Field`, one `Action`
+`packages/promoter/fixtures/prescription-l2.golden.json` 열기:
+- `Form` 1, `Field` 2, `Action` 1
 - `order.drug` Field: `label:"약품"`, `required:true`, `status:"known"`
 - `order.dose` Field: `dataType:"number"`, `required:"unknown"`, `status:"ambiguous"`
-- Every `nodeId` is `l2:<12hex>`, every `derivedFrom[0]` is `l1:<12hex>`
+- 모든 `nodeId`가 `l2:<12hex>`, 모든 `derivedFrom[0]`이 `l1:<12hex>`
 
-- [ ] **Step 4: Full suite + typecheck**
+- [ ] **Step 4: 전체 스위트 + 타입체크**
 
 Run: `pnpm test`
-Expected: all packages green (ir-schema + lift + promoter)
+Expected: 전 패키지 green (ir-schema + lift + promoter)
 Run: `pnpm typecheck`
 Expected: exit 0
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: 커밋**
 
 ```bash
 git add packages/promoter/fixtures/ packages/promoter/src/determinism.test.ts
