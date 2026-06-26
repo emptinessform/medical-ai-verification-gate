@@ -24,6 +24,14 @@ function selectorOf(target: string | string[]): string {
   return Array.isArray(target) ? target[target.length - 1] : target;
 }
 
+function sanitizeObserved(data: Record<string, unknown>): Record<string, unknown> {
+  if (!('stack' in data)) return data;
+  // a stack trace carries absolute paths — non-deterministic and never audit evidence
+  const { stack: _stack, ...rest } = data;
+  void _stack;
+  return rest;
+}
+
 function observedOf(node: AxeNode): Record<string, unknown> {
   for (const group of [node.any, node.all, node.none]) {
     if (group) {
@@ -61,7 +69,7 @@ export function mapAxeResults(
             appliesTo: makeNodeId('l1', opts.tenantId, path),
             impact: r.impact ?? 'moderate',
             measurable: true,
-            observed: incomplete ? { ...data, result: 'incomplete' } : data,
+            observed: incomplete ? { ...sanitizeObserved(data), result: 'incomplete' } : sanitizeObserved(data),
             scenarioId: opts.scenarioId,
           });
         }

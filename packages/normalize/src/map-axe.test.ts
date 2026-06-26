@@ -75,6 +75,16 @@ describe('mapAxeResults', () => {
     expect(facts[0].observed).toEqual({ ratio: 2, result: 'incomplete' });
   });
 
+  it('strips a non-deterministic stack trace from observed but keeps other fields', () => {
+    const d = doc('<form><button id="b">저장</button></form>');
+    const facts = mapAxeResults({ violations: [], incomplete: [
+      { id: 'color-contrast', impact: null, nodes: [{ target: ['#b'], any: [{ data: {
+        message: 'Skipping color-contrast', stack: 'TypeError\n  at D:\\\\x\\\\axe.js:1:1' } }] }] },
+    ] }, d, opts);
+    expect(facts[0].observed).toEqual({ message: 'Skipping color-contrast', result: 'incomplete' });
+    expect('stack' in (facts[0].observed as object)).toBe(false);
+  });
+
   it('preserves primitive check data by wrapping it', () => {
     const d = doc('<form><input id="x"/></form>');
     const facts = mapAxeResults({ violations: [
