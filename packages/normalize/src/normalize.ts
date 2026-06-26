@@ -14,6 +14,10 @@ const AXE_ENGINE = 'axe-core@4.x';
 // as liftHtml (which also wraps html in <body>…</body>).
 const _sharedDom = new JSDOM('<!DOCTYPE html><html><head></head><body></body></html>');
 
+// NOT safe for concurrent invocation: `_sharedDom` is module-level mutable state.
+// Two overlapping calls would clobber each other's body.innerHTML and produce
+// silently wrong facts. The verification pipeline runs Runs sequentially, so this
+// is fine today; do not call this inside Promise.all without serializing.
 export async function normalizeHtml(args: {
   html: string;
   tenantId: string;
