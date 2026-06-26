@@ -37,4 +37,8 @@ describe('effectiveSeverity', () => {
       expect(effectiveSeverity(v({ nodeStatus: s }), block, rule)).not.toBe('block');
     }
   });
+  it('INVARIANT holds even if confidence is high and rollout is block, for non-known status', () => {
+    // demote policy + unknown status: must not block regardless of confidence/rollout
+    expect(effectiveSeverity(v({ nodeStatus: 'unknown', confidence: 1 }), block, rule)).toBe('warn');
+  });
 });
