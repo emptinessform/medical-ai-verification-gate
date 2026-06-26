@@ -66,4 +66,20 @@ describe('mapAxeResults', () => {
     };
     expect(mapAxeResults(axe, d, opts)).toHaveLength(1);
   });
+
+  it('keeps the incomplete marker even when check data has a result key', () => {
+    const d = doc('<form><input id="x"/></form>');
+    const facts = mapAxeResults({ violations: [], incomplete: [
+      { id: 'color-contrast', impact: null, nodes: [{ target: ['#x'], any: [{ data: { result: 'spoofed', ratio: 2 } }] }] },
+    ] }, d, opts);
+    expect(facts[0].observed).toEqual({ ratio: 2, result: 'incomplete' });
+  });
+
+  it('preserves primitive check data by wrapping it', () => {
+    const d = doc('<form><input id="x"/></form>');
+    const facts = mapAxeResults({ violations: [
+      { id: 'label', impact: 'serious', nodes: [{ target: ['#x'], any: [{ data: 'too-short' }] }] },
+    ], incomplete: [] }, d, opts);
+    expect(facts[0].observed).toEqual({ value: 'too-short' });
+  });
 });

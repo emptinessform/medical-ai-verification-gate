@@ -28,7 +28,10 @@ function observedOf(node: AxeNode): Record<string, unknown> {
   for (const group of [node.any, node.all, node.none]) {
     if (group) {
       for (const c of group) {
-        if (c.data && typeof c.data === 'object') return c.data as Record<string, unknown>;
+        if (c.data == null) continue;
+        return typeof c.data === 'object'
+          ? (c.data as Record<string, unknown>)
+          : { value: c.data };
       }
     }
   }
@@ -58,7 +61,7 @@ export function mapAxeResults(
             appliesTo: makeNodeId('l1', opts.tenantId, path),
             impact: r.impact ?? 'moderate',
             measurable: true,
-            observed: incomplete ? { result: 'incomplete', ...data } : data,
+            observed: incomplete ? { ...data, result: 'incomplete' } : data,
             scenarioId: opts.scenarioId,
           });
         }
