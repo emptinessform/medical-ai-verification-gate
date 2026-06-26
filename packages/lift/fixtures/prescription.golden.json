@@ -1,0 +1,256 @@
+{
+  "irSchemaVersion": "1.0.0",
+  "tenantId": "hosp-A",
+  "runId": "run1",
+  "inputDigest": "sha256:5cb11f23128ab5976d0e6909f94c057ab5b3f2ab393684dedcbb16a342f23b74",
+  "l1": {
+    "rootId": "l1:b12632402cf6",
+    "nodes": {
+      "l1:838051ddccc8": {
+        "nodeId": "l1:838051ddccc8",
+        "provenance": {
+          "source": {
+            "domPath": "body>form>label"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "label",
+        "attributes": {
+          "for": "drug"
+        },
+        "text": "약품",
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": []
+      },
+      "l1:7492a7317d02": {
+        "nodeId": "l1:7492a7317d02",
+        "provenance": {
+          "source": {
+            "domPath": "body>form>select[id=drug]>option"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "option",
+        "attributes": {},
+        "text": "Amoxicillin",
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": []
+      },
+      "l1:df138fdded1e": {
+        "nodeId": "l1:df138fdded1e",
+        "provenance": {
+          "source": {
+            "domPath": "body>form>select[id=drug]"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "select",
+        "attributes": {
+          "id": "drug",
+          "name": "order.drug"
+        },
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": [
+          "l1:7492a7317d02"
+        ]
+      },
+      "l1:c77df70c0019": {
+        "nodeId": "l1:c77df70c0019",
+        "provenance": {
+          "source": {
+            "domPath": "body>form>input[id=dose]"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "input",
+        "attributes": {
+          "id": "dose",
+          "name": "order.dose",
+          "type": "number",
+          "value": "500"
+        },
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": []
+      },
+      "l1:e0b998b31ebf": {
+        "nodeId": "l1:e0b998b31ebf",
+        "provenance": {
+          "source": {
+            "domPath": "body>form>button"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "button",
+        "attributes": {},
+        "text": "처방 저장",
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": []
+      },
+      "l1:b12632402cf6": {
+        "nodeId": "l1:b12632402cf6",
+        "provenance": {
+          "source": {
+            "domPath": "body>form"
+          },
+          "captureId": "run1",
+          "scenarioId": "empty"
+        },
+        "confidence": 1,
+        "status": "known",
+        "derivedFrom": [],
+        "scenarioCoverage": [
+          "empty"
+        ],
+        "tag": "form",
+        "attributes": {},
+        "computed": {
+          "contrast": {
+            "value": null,
+            "measured": false
+          },
+          "focusable": {
+            "value": null,
+            "measured": false
+          },
+          "tabOrder": {
+            "value": null,
+            "measured": false
+          },
+          "fontSizePx": {
+            "value": null,
+            "measured": false
+          }
+        },
+        "children": [
+          "l1:838051ddccc8",
+          "l1:df138fdded1e",
+          "l1:c77df70c0019",
+          "l1:e0b998b31ebf"
+        ]
+      }
+    }
+  },
+  "l2": [],
+  "l3": [],
+  "facts": []
+}
