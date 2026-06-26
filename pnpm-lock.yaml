@@ -68,6 +68,12 @@ importers:
         specifier: workspace:*
         version: link:../lift
 
+  packages/rules:
+    dependencies:
+      '@sb/ir-schema':
+        specifier: workspace:*
+        version: link:../ir-schema
+
 packages:
 
   '@asamuzakjp/css-color@3.2.0':

@@ -5,6 +5,7 @@
     { "path": "packages/lift" },
     { "path": "packages/promoter" },
     { "path": "packages/normalize" },
-    { "path": "packages/engine" }
+    { "path": "packages/engine" },
+    { "path": "packages/rules" }
   ]
 }
