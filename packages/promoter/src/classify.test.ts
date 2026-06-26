@@ -29,6 +29,15 @@ describe('classifyNode', () => {
     expect(classifyNode(node({ tag: 'div' }))).toBeNull();
     expect(classifyNode(node({ tag: 'label' }))).toBeNull();
   });
+  it('classifies input[type=button] and input[type=reset] as Action', () => {
+    expect(classifyNode(node({ tag: 'input', attributes: { type: 'button' } }))).toBe('Action');
+    expect(classifyNode(node({ tag: 'input', attributes: { type: 'reset' } }))).toBe('Action');
+  });
+  it('classifies role=button as Action and role=spinbutton/checkbox as Field', () => {
+    expect(classifyNode(node({ tag: 'div', attributes: { role: 'button' } }))).toBe('Action');
+    expect(classifyNode(node({ tag: 'div', attributes: { role: 'spinbutton' } }))).toBe('Field');
+    expect(classifyNode(node({ tag: 'div', attributes: { role: 'checkbox' } }))).toBe('Field');
+  });
 });
 
 describe('l2IdFor', () => {
@@ -38,5 +47,9 @@ describe('l2IdFor', () => {
     const b = l2IdFor('hosp-A', n);
     expect(a).toBe(b);
     expect(a).toMatch(/^l2:[0-9a-f]{12}$/);
+  });
+  it('throws when the L1 provenance has no domPath', () => {
+    const n = node({ tag: 'input', provenance: { source: { file: 'a.tsx', line: 1, col: 2 }, captureId: 'c', scenarioId: 'empty' } });
+    expect(() => l2IdFor('hosp-A', n)).toThrow(/domPath/);
   });
 });
