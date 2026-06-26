@@ -1,0 +1,100 @@
+[
+  {
+    "nodeId": "l2:b12632402cf6",
+    "provenance": {
+      "source": {
+        "domPath": "body>form"
+      },
+      "captureId": "r",
+      "scenarioId": "empty"
+    },
+    "confidence": 0.95,
+    "status": "known",
+    "derivedFrom": [
+      "l1:b12632402cf6"
+    ],
+    "scenarioCoverage": [
+      "empty"
+    ],
+    "kind": "Form",
+    "fields": [
+      "l2:df138fdded1e",
+      "l2:c77df70c0019"
+    ],
+    "actions": [
+      "l2:e0b998b31ebf"
+    ]
+  },
+  {
+    "nodeId": "l2:c77df70c0019",
+    "provenance": {
+      "source": {
+        "domPath": "body>form>input[id=dose]"
+      },
+      "captureId": "r",
+      "scenarioId": "empty"
+    },
+    "confidence": 0.5,
+    "status": "ambiguous",
+    "derivedFrom": [
+      "l1:c77df70c0019"
+    ],
+    "scenarioCoverage": [
+      "empty"
+    ],
+    "kind": "Field",
+    "label": null,
+    "required": "unknown",
+    "dataType": "number",
+    "binding": {
+      "scope": "ui-internal",
+      "path": "order.dose"
+    }
+  },
+  {
+    "nodeId": "l2:df138fdded1e",
+    "provenance": {
+      "source": {
+        "domPath": "body>form>select[id=drug]"
+      },
+      "captureId": "r",
+      "scenarioId": "empty"
+    },
+    "confidence": 0.85,
+    "status": "known",
+    "derivedFrom": [
+      "l1:df138fdded1e"
+    ],
+    "scenarioCoverage": [
+      "empty"
+    ],
+    "kind": "Field",
+    "label": "약품",
+    "required": true,
+    "dataType": "code",
+    "binding": {
+      "scope": "ui-internal",
+      "path": "order.drug"
+    }
+  },
+  {
+    "nodeId": "l2:e0b998b31ebf",
+    "provenance": {
+      "source": {
+        "domPath": "body>form>button"
+      },
+      "captureId": "r",
+      "scenarioId": "empty"
+    },
+    "confidence": 0.7,
+    "status": "known",
+    "derivedFrom": [
+      "l1:e0b998b31ebf"
+    ],
+    "scenarioCoverage": [
+      "empty"
+    ],
+    "kind": "Action",
+    "role": "submit"
+  }
+]
