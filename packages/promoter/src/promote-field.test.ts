@@ -28,6 +28,16 @@ describe('resolveLabel', () => {
     const input = n('l1:i', 'input', { id: 'x' });
     expect(resolveLabel(input, graph(input))).toEqual({ label: null, confidence: 0.95, ambiguous: false });
   });
+  it('joins multiple aria-labelledby ids (0.9)', () => {
+    const input = n('l1:i', 'input', { 'aria-labelledby': 'l1 l2' });
+    const a = n('l1:a', 'span', { id: 'l1' }, '약품');
+    const b = n('l1:b', 'span', { id: 'l2' }, '용량');
+    expect(resolveLabel(input, graph(input, a, b))).toEqual({ label: '약품 용량', confidence: 0.9, ambiguous: false });
+  });
+  it('returns ambiguous when aria-labelledby points to nothing', () => {
+    const input = n('l1:i', 'input', { 'aria-labelledby': 'missing' });
+    expect(resolveLabel(input, graph(input))).toEqual({ label: null, confidence: 0.6, ambiguous: true });
+  });
 });
 
 describe('resolveRequired', () => {

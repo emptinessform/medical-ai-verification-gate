@@ -17,11 +17,20 @@ export function resolveLabel(
   // aria-label (0.9)
   const aria = field.attributes['aria-label'];
   if (aria) return { label: aria, confidence: 0.9, ambiguous: false };
-  // aria-labelledby → referenced node text (0.9)
+  // aria-labelledby → referenced node text (0.9, multiple IDs supported)
   const labelledby = field.attributes['aria-labelledby'];
   if (labelledby) {
-    const ref = Object.values(l1.nodes).find((x) => x.attributes['id'] === labelledby);
-    if (ref?.text) return { label: ref.text, confidence: 0.9, ambiguous: false };
+    const ids = labelledby.split(/\s+/).filter(Boolean);
+    const texts: string[] = [];
+    for (const id of ids) {
+      const ref = Object.values(l1.nodes).find((x) => x.attributes['id'] === id);
+      if (ref?.text) texts.push(ref.text);
+    }
+    if (texts.length > 0) {
+      return { label: texts.join(' '), confidence: 0.9, ambiguous: false };
+    }
+    // aria-labelledby present but dangling → ambiguous, not confirmed absent
+    return { label: null, confidence: 0.6, ambiguous: true };
   }
   // confirmed absent — null + known (0.95)
   return { label: null, confidence: 0.95, ambiguous: false };
