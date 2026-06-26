@@ -45,4 +45,11 @@ describe('main', () => {
   it('returns exit 2 on an unknown/missing subcommand', async () => {
     expect(await main([], NOW)).toBe(2);
   });
+  it('returns exit 2 when the output path is unwritable', async () => {
+    const { input } = setup(DIRTY);
+    // a path whose parent directory does not exist → writeFileSync throws
+    const badOut = join(tmp!, 'no-such-dir', 'report.json');
+    const code = await main(['verify', '--input', input, '--tenant', 'hosp-A', '--out', badOut], NOW);
+    expect(code).toBe(2);
+  });
 });

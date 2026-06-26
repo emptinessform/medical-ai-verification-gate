@@ -49,7 +49,14 @@ export async function main(argv: string[], now: string): Promise<number> {
   const format = args['format'] === 'sarif' ? 'sarif' : 'json';
   const out = typeof args['out'] === 'string' ? (args['out'] as string) : undefined;
   const payload = format === 'sarif' ? toSarif(res.report) : res.report;
-  if (out) writeFileSync(out, JSON.stringify(payload, null, 2));
+  if (out) {
+    try {
+      writeFileSync(out, JSON.stringify(payload, null, 2));
+    } catch {
+      process.stderr.write(`error: cannot write output file: ${out}\n`);
+      return 2; // tool-error
+    }
+  }
 
   const s = res.report.summary;
   process.stdout.write(
