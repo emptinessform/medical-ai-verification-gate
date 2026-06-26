@@ -3,3 +3,4 @@ export * from './scalars.js';
 export * from './node-meta.js';
 export * from './ir.js';
 export * from './l2.js';
+export * from './gate.js';
