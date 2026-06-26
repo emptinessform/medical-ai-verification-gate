@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소프트보울 의료 AI 생성물 검증·거버넌스 솔루션 — 확정 최종 시스템 아키텍처</title>
+<style>
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+code.hljs {
+  padding: 3px 5px
+}
+/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/
+.hljs {
+  color: #24292e;
+  background: #ffffff
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  /* prettylights-syntax-keyword */
+  color: #d73a49
+}
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  /* prettylights-syntax-entity */
+  color: #6f42c1
+}
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-variable,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id {
+  /* prettylights-syntax-constant */
+  color: #005cc5
+}
+.hljs-regexp,
+.hljs-string,
+.hljs-meta .hljs-string {
+  /* prettylights-syntax-string */
+  color: #032f62
+}
+.hljs-built_in,
+.hljs-symbol {
+  /* prettylights-syntax-variable */
+  color: #e36209
+}
+.hljs-comment,
+.hljs-code,
+.hljs-formula {
+  /* prettylights-syntax-comment */
+  color: #6a737d
+}
+.hljs-name,
+.hljs-quote,
+.hljs-selector-tag,
+.hljs-selector-pseudo {
+  /* prettylights-syntax-entity-tag */
+  color: #22863a
+}
+.hljs-subst {
+  /* prettylights-syntax-storage-modifier-import */
+  color: #24292e
+}
+.hljs-section {
+  /* prettylights-syntax-markup-heading */
+  color: #005cc5;
+  font-weight: bold
+}
+.hljs-bullet {
+  /* prettylights-syntax-markup-list */
+  color: #735c0f
+}
+.hljs-emphasis {
+  /* prettylights-syntax-markup-italic */
+  color: #24292e;
+  font-style: italic
+}
+.hljs-strong {
+  /* prettylights-syntax-markup-bold */
+  color: #24292e;
+  font-weight: bold
+}
+.hljs-addition {
+  /* prettylights-syntax-markup-inserted */
+  color: #22863a;
+  background-color: #f0fff4
+}
+.hljs-deletion {
+  /* prettylights-syntax-markup-deleted */
+  color: #b31d28;
+  background-color: #ffeef0
+}
+.hljs-char.escape_,
+.hljs-link,
+.hljs-params,
+.hljs-property,
+.hljs-punctuation,
+.hljs-tag {
+  /* purposely ignored */
+  
+}
+:root{
+  --ink:#1b2127; --ink-soft:#3f474f; --ink-faint:#79828b;
+  --line:#e6e4db; --line-soft:#f0eee7; --paper:#f7f5ef; --card:#ffffff;
+  --accent:#0f6e56; --accent-deep:#0c4f3f; --accent-soft:#e6f4ef;
+  --warn:#854f0b; --warn-soft:#faf0dd; --danger:#a32d2d;
+  --code-bg:#f6f8fa; --sidebar:#fbfaf6;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  --sans:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo",system-ui,sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.68;-webkit-font-smoothing:antialiased;}
+
+/* ── topbar ── */
+.topbar{position:sticky;top:0;z-index:30;height:48px;display:flex;align-items:center;gap:10px;
+  padding:0 20px;background:rgba(247,245,239,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink-faint);}
+.topbar .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.topbar b{color:var(--ink-soft);font-weight:600;}
+.topbar .sp{margin-left:auto;}
+.topbar button{font:inherit;font-size:12px;color:var(--accent);background:var(--accent-soft);border:1px solid #bfe3d6;
+  border-radius:7px;padding:4px 11px;cursor:pointer;}
+.topbar #menuBtn{display:none;}
+
+/* ── layout ── */
+.layout{display:grid;grid-template-columns:300px minmax(0,1fr);max-width:1280px;margin:0 auto;}
+.sidebar{position:sticky;top:48px;align-self:start;height:calc(100vh - 48px);overflow-y:auto;
+  background:var(--sidebar);border-right:1px solid var(--line);padding:22px 14px 60px;}
+.sidebar .toc-title{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  font-weight:700;padding:0 10px;margin-bottom:12px;}
+.toc-item{display:block;text-decoration:none;color:var(--ink-soft);font-size:13px;line-height:1.4;
+  padding:5px 10px;border-radius:7px;border-left:2px solid transparent;}
+.toc-item:hover{background:#fff;color:var(--ink);}
+.toc-item.lvl2{font-weight:600;color:var(--ink);margin-top:6px;}
+.toc-item.lvl3{padding-left:24px;font-size:12.5px;color:var(--ink-faint);}
+.toc-item.active{color:var(--accent);background:#fff;border-left-color:var(--accent);font-weight:600;}
+
+/* ── content ── */
+.content{padding:0 clamp(20px,4vw,64px) 120px;min-width:0;}
+.hero{padding:48px 0 28px;border-bottom:1px solid var(--line);margin-bottom:8px;}
+.hero .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px;}
+.hero h1{font-size:clamp(24px,3.4vw,33px);line-height:1.25;letter-spacing:-.02em;font-weight:800;margin:0;}
+
+article{font-size:15.5px;}
+article h2{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:54px 0 8px;padding-top:14px;line-height:1.28;}
+article h2:first-of-type{margin-top:30px;}
+article h3{font-size:18.5px;font-weight:700;margin:34px 0 8px;color:var(--ink);}
+article h4{font-size:15.5px;font-weight:700;margin:24px 0 6px;color:var(--accent-deep);}
+.hd{scroll-margin-top:64px;position:relative;}
+.hd .anchor{position:absolute;left:-22px;top:0;color:var(--line);text-decoration:none;font-weight:400;opacity:0;transition:opacity .12s;}
+.hd:hover .anchor{opacity:1;color:var(--accent);}
+article p{margin:12px 0;color:var(--ink-soft);}
+article strong{color:var(--ink);font-weight:700;}
+article a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfe3d6;}
+
+article ul,article ol{margin:12px 0;padding-left:24px;}
+article li{margin:6px 0;color:var(--ink-soft);}
+article li::marker{color:var(--accent);}
+
+/* inline code */
+article :not(pre)>code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);color:var(--accent-deep);
+  padding:1.5px 6px;border-radius:5px;border:1px solid #d4ebe3;white-space:nowrap;}
+
+/* code blocks */
+pre.hljs{font-family:var(--mono);font-size:13px;line-height:1.6;background:var(--code-bg)!important;
+  border:1px solid var(--line);border-radius:11px;padding:16px 18px;overflow-x:auto;margin:16px 0;
+  -webkit-overflow-scrolling:touch;}
+pre.hljs code{font-family:inherit;background:none;padding:0;border:0;white-space:pre;color:#24292e;}
+pre.plain code{color:var(--ink-soft);}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:11px;}
+article table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px;}
+article thead th{background:var(--accent-soft);color:var(--accent-deep);font-weight:700;text-align:left;
+  padding:10px 14px;border-bottom:1px solid #cfeae0;white-space:nowrap;}
+article tbody td{padding:9px 14px;border-top:1px solid var(--line-soft);color:var(--ink-soft);vertical-align:top;}
+article tbody tr:nth-child(even){background:#fbfaf6;}
+article td code,article th code{white-space:normal;}
+
+/* blockquote → callout (검토 교정/기반 결정 등) */
+article blockquote{margin:18px 0;background:var(--warn-soft);border:1px solid #ecd9b3;border-left:4px solid var(--warn);
+  border-radius:0 11px 11px 0;padding:14px 20px;color:#5c4410;}
+article blockquote p{color:#5c4410;margin:6px 0;}
+article blockquote strong{color:#3f2e08;}
+article blockquote :not(pre)>code{background:#f3e6cb;color:#5c4410;border-color:#e3cfa3;}
+
+article hr{border:0;border-top:1px solid var(--line);margin:40px 0;}
+
+.foot{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-faint);}
+
+/* responsive */
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:fixed;top:48px;left:0;width:84%;max-width:320px;height:calc(100vh - 48px);z-index:25;
+    transform:translateX(-103%);transition:transform .22s ease;box-shadow:0 12px 40px rgba(0,0,0,.18);}
+  .sidebar.open{transform:none;}
+  .topbar #menuBtn{display:inline-block;}
+  .scrim{position:fixed;inset:48px 0 0 0;background:rgba(0,0,0,.28);z-index:24;display:none;}
+  .scrim.open{display:block;}
+}
+
+/* print */
+@media print{
+  .topbar,.sidebar,.scrim{display:none!important;}
+  .layout{display:block;max-width:none;}
+  .content{padding:0;}
+  pre.hljs,.tbl-wrap,blockquote,article h2,article h3{break-inside:avoid;}
+  article h2{break-before:auto;}
+  a{color:inherit;border:0;}
+  body{background:#fff;}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button id="menuBtn" aria-label="목차">☰</button>
+  <span class="dot"></span>
+  <b>소프트보울</b> · 의료 AI 생성물 검증·거버넌스 솔루션
+  <span class="sp"></span>
+  <button onclick="window.print()">PDF / 인쇄</button>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="toc-title">목차</div>
+    <a class="toc-item lvl2" href="#0-요약-설계-원칙">0. 요약 &amp; 설계 원칙</a>
+<a class="toc-item lvl3" href="#0-1-무엇을-짓는가-한-문단">0.1 무엇을 짓는가 (한 문단)</a>
+<a class="toc-item lvl3" href="#0-2-기반-선정의-논리-단순-짜깁기가-아닌-이유">0.2 기반 선정의 논리 (단순 짜깁기가 아닌 이유)</a>
+<a class="toc-item lvl3" href="#0-3-핵심-설계-원칙-p1-p10">0.3 핵심 설계 원칙 (P1~P10)</a>
+<a class="toc-item lvl3" href="#0-4-1단계-진짜-롱폴-리스크-격상-세-렌즈-공통-교정">0.4 1단계 진짜 롱폴 리스크 격상 (세 렌즈 공통 교정)</a>
+<a class="toc-item lvl2" href="#1-시스템-컨텍스트-데이터-흐름">1. 시스템 컨텍스트 &amp; 데이터 흐름</a>
+<a class="toc-item lvl3" href="#1-1-시스템-컨텍스트">1.1 시스템 컨텍스트</a>
+<a class="toc-item lvl3" href="#1-2-종단-데이터-흐름-1-verification-run">1.2 종단 데이터 흐름 (1 Verification Run)</a>
+<a class="toc-item lvl2" href="#2-l1-입력-어댑터">2. L1 입력 어댑터</a>
+<a class="toc-item lvl3" href="#2-1-책임-경계-capture-lift-층화-c에서-접목">2.1 책임 경계 (Capture/LIFT 층화 — C에서 접목)</a>
+<a class="toc-item lvl3" href="#2-2-인터페이스-1일차-동결-이후-불변">2.2 인터페이스 (1일차 동결, 이후 불변)</a>
+<a class="toc-item lvl3" href="#2-3-입력-경로-우선순위-제약-c">2.3 입력 경로 우선순위 (제약 C)</a>
+<a class="toc-item lvl3" href="#2-4-어댑터-추가-방법">2.4 어댑터 추가 방법</a>
+<a class="toc-item lvl2" href="#3-l2-ir-다층-스키마-구체-예시-설계의-심장">3. L2 IR — 다층 스키마 + 구체 예시 (설계의 심장)</a>
+<a class="toc-item lvl3" href="#3-1-다층-구조-제약-b-단일-평면-트리-금지">3.1 다층 구조 (제약 B: 단일 평면 트리 금지)</a>
+<a class="toc-item lvl3" href="#3-2-공통-메타-모든-레이어-노드-1급-필드-제약-b">3.2 공통 메타 (모든 레이어 노드 1급 필드 — 제약 B)</a>
+<a class="toc-item lvl3" href="#3-3-레이어별-노드-타입">3.3 레이어별 노드 타입</a>
+<a class="toc-item lvl3" href="#3-4-외부-사실-facts-스키마-axe-facts-매핑-명세-검토-thin-해소">3.4 외부 사실(facts) 스키마 (axe→facts 매핑 명세 — 검토 thin 해소)</a>
+<a class="toc-item lvl3" href="#3-5-1순위-리스크-semantic-promoter-알고리즘-명세-세-안-공통-사각-해소">3.5 1순위 리스크: Semantic Promoter 알고리즘 명세 (세 안 공통 사각 해소)</a>
+<a class="toc-item lvl3" href="#3-6-contractbinder-계약기반-정합성의-실행-경로-검토-high-2-해소">3.6 ContractBinder — 계약기반 정합성의 실행 경로 (검토 high-2 해소)</a>
+<a class="toc-item lvl3" href="#3-7-교차-시나리오-finding-합성-dedup-검토-r2-1단계로-끌어옴">3.7 교차 시나리오 Finding 합성·dedup (검토 R2 — 1단계로 끌어옴)</a>
+<a class="toc-item lvl3" href="#3-8-구체-예시-처방-화면을-실제-ir로">3.8 구체 예시 — 처방 화면을 실제 IR로</a>
+<a class="toc-item lvl2" href="#4-l3-규칙-엔진-플러그인-인터페이스-심각도-롤아웃">4. L3 규칙 엔진 — 플러그인 인터페이스 + 심각도/롤아웃</a>
+<a class="toc-item lvl3" href="#4-1-규칙-플러그인-인터페이스-시그니처">4.1 규칙 플러그인 인터페이스 (시그니처)</a>
+<a class="toc-item lvl3" href="#4-2-규칙이-ir-위에서-도는-방식-예시">4.2 규칙이 IR 위에서 도는 방식 (예시)</a>
+<a class="toc-item lvl3" href="#4-3-누수-교정-미측정-vs-통과-구분-렌즈2-미해결난제-해소">4.3 누수 교정: '미측정' vs '통과' 구분 (렌즈2 미해결난제 해소)</a>
+<a class="toc-item lvl3" href="#4-4-심각도-모델-두-겹-confidence-status-게이팅-검토-high-1-핵심">4.4 심각도 모델 — 두 겹 × confidence × status 게이팅 (검토 high-1 핵심)</a>
+<a class="toc-item lvl3" href="#4-5-staged-rollout-break-glass-제약-h">4.5 Staged Rollout + Break-glass (제약 H)</a>
+<a class="toc-item lvl3" href="#4-6-4종-검사의-처리-위치">4.6 4종 검사의 처리 위치</a>
+<a class="toc-item lvl3" href="#4-7-미측정-노드의-게이트-처리-검토-thin-해소">4.7 미측정 노드의 게이트 처리 (검토 thin 해소)</a>
+<a class="toc-item lvl3" href="#4-8-1단계-접근성-5규칙">4.8 1단계 접근성 5규칙</a>
+<a class="toc-item lvl2" href="#5-l4-리포트-게이트">5. L4 리포트 + 게이트</a>
+<a class="toc-item lvl3" href="#5-1-리포트-스키마-머신리더블-개발자-뷰는-이것의-렌더링">5.1 리포트 스키마 (머신리더블, 개발자 뷰는 이것의 렌더링)</a>
+<a class="toc-item lvl3" href="#5-2-게이트-결정-로직-exit-code-계약-검토-thin-해소-1일차-고정">5.2 게이트 결정 로직 + Exit Code 계약 (검토 thin 해소 — 1일차 고정)</a>
+<a class="toc-item lvl3" href="#5-3-ci-통합">5.3 CI 통합</a>
+<a class="toc-item lvl2" href="#6-l5-룰-저장소-ip-보호">6. L5 룰 저장소 + IP 보호</a>
+<a class="toc-item lvl3" href="#6-1-데이터-모델">6.1 데이터 모델</a>
+<a class="toc-item lvl3" href="#6-2-버전관리-승인-감사-제약-e">6.2 버전관리·승인·감사 (제약 E)</a>
+<a class="toc-item lvl3" href="#6-3-룰-ip-서버측-보호-제약-f-oss-도메인-하이브리드">6.3 룰 IP 서버측 보호 (제약 F) — OSS/도메인 하이브리드</a>
+<a class="toc-item lvl3" href="#6-4-tenant-룰셋-합성-검토-medium-해소-1단계-정의">6.4 tenant 룰셋 합성 (검토 medium 해소 — 1단계 정의)</a>
+<a class="toc-item lvl2" href="#7-횡단-관심사">7. 횡단 관심사</a>
+<a class="toc-item lvl3" href="#7-1-책임-경계-samd-회피-제약-e-구조로-강제">7.1 책임 경계 / SaMD 회피 (제약 E) — 구조로 강제</a>
+<a class="toc-item lvl3" href="#7-2-멀티테넌시-벤더-독립-제약-g">7.2 멀티테넌시 · 벤더 독립 (제약 G)</a>
+<a class="toc-item lvl3" href="#7-3-관측성">7.3 관측성</a>
+<a class="toc-item lvl3" href="#7-4-성능-예산-에러-처리-검토-thin-해소">7.4 성능 예산 &amp; 에러 처리 (검토 thin 해소)</a>
+<a class="toc-item lvl2" href="#8-기술-스택-배포">8. 기술 스택 &amp; 배포</a>
+<a class="toc-item lvl2" href="#9-단계별-진화-매핑-1-2-3단계-빌드-순서">9. 단계별 진화 매핑 (1/2/3단계 빌드 순서)</a>
+<a class="toc-item lvl2" href="#10-핵심-설계-결정-adr-트레이드오프">10. 핵심 설계 결정 (ADR) &amp; 트레이드오프</a>
+<a class="toc-item lvl2" href="#11-리스크-미해결-질문">11. 리스크 &amp; 미해결 질문</a>
+<a class="toc-item lvl3" href="#한-줄-요약">한 줄 요약</a>
+  </nav>
+  <main class="content">
+    <header class="hero">
+      <div class="eyebrow">시스템 아키텍처 · 확정본</div>
+      <h1>소프트보울 의료 AI 생성물 검증·거버넌스 솔루션 — 확정 최종 시스템 아키텍처</h1>
+    </header>
+    <article id="article">
+
+<blockquote>
+<p>기반 결정: <strong>A(출하우선)을 골격으로, C(거버넌스해자)의 책임경계·층화 코어를 구조에 접목하고, B(진화확장)의 타입 규율을 흡수한 정당화된 하이브리드.</strong> 세 렌즈가 공통으로 권고한 절충선을 그대로 채택한다 — <em>스키마/인터페이스는 3단계 미래형으로 1일차에 동결하고, 실행코드/인프라는 1단계 현재형으로 미룬다.</em> 이 한 문장이 제약 A(무재작업 진화)와 1단계 출하속도를 동시에 만족시키는 유일한 규율이다.</p>
+<p><strong>확정본 변경 요약(적대적 검토 반영):</strong> 본 버전은 v1의 구조·강점을 유지하되, 검토가 지적한 횡단 실행계약 공백을 모두 메웠다 — (1) <strong>fail-closed가 <code>status</code>(unknown/ambiguous)까지 지배</strong>하도록 유효심각도 모델을 재정의(§4.4, ADR-5), (2) <strong><code>ContractBinder</code> 단계 신설</strong>로 계약기반 정합성을 실행가능하게 함(§3.6, ADR-3·9), (3) <strong>결정적 <code>nodeId</code> 생성·교차시나리오/재실행 안정성 규약 확정</strong>(§3.2.1, ADR-10), (4) <strong>Promoter↔facts 순서 모순 해소</strong>(§1.2 파이프라인 재정렬), (5) <strong>scenarios dedup을 1단계로 끌어와 명세</strong>(§3.7), (6) <strong>exit-code 계약·prevHash·tenant 합성·미측정 게이트·break-glass 인가·위양성 라벨링을 1일차 고정</strong>(§5.2·§6.2·§4.7·§7). 모든 변경은 &quot;필드/단계/규약&quot; 추가이며 인터페이스 동결 원칙을 깨지 않는다.</p>
+</blockquote>
+<hr>
+<h2 id="0-요약-설계-원칙" class="hd"><a class="anchor" href="#0-요약-설계-원칙" aria-label="anchor">#</a>0. 요약 &amp; 설계 원칙</h2>
+<h3 id="0-1-무엇을-짓는가-한-문단" class="hd"><a class="anchor" href="#0-1-무엇을-짓는가-한-문단" aria-label="anchor">#</a>0.1 무엇을 짓는가 (한 문단)</h3>
+<p>AI(LLM)가 생성한 의료 EHR 화면을 병원 배포 전에 검사하는 <strong>게이트</strong>다. 생성과 경쟁하지 않고 &quot;배포 전 반드시 통과하는 검증 레이어&quot;를 소유한다. 5계층(어댑터 → IR → 규칙엔진 → 리포트+게이트 → 룰저장소)으로 구성되며, <strong>소프트보울은 의학적 판정을 하지 않고 외부 승인 규격 위반 여부만 집행</strong>한다.</p>
+<h3 id="0-2-기반-선정의-논리-단순-짜깁기가-아닌-이유" class="hd"><a class="anchor" href="#0-2-기반-선정의-논리-단순-짜깁기가-아닌-이유" aria-label="anchor">#</a>0.2 기반 선정의 논리 (단순 짜깁기가 아닌 이유)</h3>
+<p>세 렌즈의 권고가 갈렸다 — 렌즈1(실현가능성)은 A 기반, 렌즈2(기술견고성)는 C 기반, 렌즈3(전략해자)은 C 기반. 이 충돌을 다음 원리로 해소한다.</p>
+<ul>
+<li><strong>골격은 A로 잡는다.</strong> 세 렌즈가 일치한 사실: 무재작업 진화 구조(빈 L3 + <code>requires</code> 자동 skip + 바인딩 슬롯 + 순수함수 룰의 서버화 유보)는 세 안이 <em>구조적으로 동등하게 정직</em>하다. 그렇다면 1단계 출하속도가 가장 빠른 A가 골격의 자연스러운 기준점이다. C가 1단계로 당긴 머시너리(별도 Capture 단계, tenant_id/해시체인 감사 인프라)는 <em>산문상</em> 데모를 늦추는 과도설계다.</li>
+<li><strong>그러나 C의 두 가지는 &quot;필드/훅&quot;만 추가하면 되는 저비용·고가치라 1일차에 접목한다.</strong> (a) <strong>책임경계의 전역 fail-closed 불변식</strong>(authority 없으면 판정 출력 금지) — 나중에 못 끼워넣는 종류, SaMD 회피의 사업 존립 조건. (b) <strong>Capture/LIFT 층화</strong>(어댑터 물성이 L1로 누수되는 것을 한 겹 더 봉인) — 렌즈2가 집어낸 세 안 공통의 가장 심각한 누수 추상화를 메우는 유일한 해법.</li>
+<li><strong>C가 1단계로 당긴 인프라(해시체인 감사 저장, 멀티테넌트 격리 실물, 서버측 평가 노드)는 A식 규율로 2단계로 미룬다.</strong> 스키마 필드만 1일차에 박고 구현은 유보 → C의 전략 가치를 출하속도 손실 없이 확보.</li>
+<li><strong>B의 타입 규율은 비용 0이라 전면 흡수한다.</strong> <code>unknown ≠ null</code> 분리, <code>irSchemaVersion</code> 단일 패키지 공유, 룰셋 version pin.</li>
+</ul>
+<h3 id="0-3-핵심-설계-원칙-p1-p10" class="hd"><a class="anchor" href="#0-3-핵심-설계-원칙-p1-p10" aria-label="anchor">#</a>0.3 핵심 설계 원칙 (P1~P10)</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>원칙</th>
+<th>구조적 강제 방식 (말이 아닌 코드)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>P1</strong></td>
+<td>스키마는 미래형, 코드/인프라는 현재형 (제약 A)</td>
+<td>IR L1/L2/L3·바인딩 슬롯·authority·tenantId·rollout enum을 1일차 타입으로 동결. eval-server/DB/해시체인 저장/큐는 인터페이스 뒤로 유보</td>
+</tr>
+<tr>
+<td><strong>P2</strong></td>
+<td>어댑터는 Capture만, IR은 LIFT가 만든다 (제약 C·G)</td>
+<td><code>InputAdapter.capture()→Capture</code>, 별도 <code>lift(Capture)→L1</code>. 어댑터 물성(런타임/정적/선언적)을 Capture에 가두고 LIFT가 균질 L1 생성</td>
+</tr>
+<tr>
+<td><strong>P3</strong></td>
+<td>규칙은 IR+facts만 읽는 순수 함수 (제약 F)</td>
+<td><code>Rule.evaluate(ir, ctx): Violation[]</code> — I/O·네트워크·부수효과 금지. 로컬→서버 격리가 인터페이스 변경 0</td>
+</tr>
+<tr>
+<td><strong>P4</strong></td>
+<td>소프트보울은 판정하지 않고 집행한다 (제약 E)</td>
+<td><strong>전역 fail-closed</strong>: <code>authority</code> 없는 Finding은 스키마 검증에서 거부. 차단 정책은 <code>tenantPolicy</code>가 소유</td>
+</tr>
+<tr>
+<td><strong>P5</strong></td>
+<td>추론으로 배포를 막지 않는다 (제약 E)</td>
+<td>confidence-gating + <strong>status-gating</strong>: IR 노드 <code>confidence &lt; rule.confidenceFloor</code> <em>또는</em> <code>status∈{unknown,ambiguous}</code>면 <code>block→warn</code> 강등(룰별 <code>unknownPolicy</code>가 지배). L1 관측사실(1.0/known)만 강하게 차단</td>
+</tr>
+<tr>
+<td><strong>P6</strong></td>
+<td>unknown은 null과 다르다 (제약 B)</td>
+<td><code>TriBool</code>/<code>status:'unknown'|'ambiguous'</code> 1급이며 <strong>게이트까지 전파</strong>된다. 정적 파서가 못 푼 분기를 false로 단정하는 거짓 통과/위반을 타입·게이트 양단에서 차단</td>
+</tr>
+<tr>
+<td><strong>P7</strong></td>
+<td>결정성 = 감사성 (제약 E·H)</td>
+<td><code>MountSpec</code>(seed/fixtures/waitFor) + <strong>결정적 <code>nodeId</code></strong>(§3.2.1) + <code>inputDigest</code> + 룰셋 version pin. 같은 (입력, 룰셋버전, IR스키마버전) → 같은 IR → 같은 결정</td>
+</tr>
+<tr>
+<td><strong>P8</strong></td>
+<td>멀티테넌시는 day-0 1급 키 (제약 G)</td>
+<td><code>tenantId</code>가 IR 루트·Capture·룰셋·게이트결정·감사의 타입 강제 필드. 런타임 규약 아님</td>
+</tr>
+<tr>
+<td><strong>P9</strong></td>
+<td>심각도(코드) ≠ rollout(거버넌스) (제약 H)</td>
+<td>유효심각도 = <code>rule.defaultSeverity × tenant.rolloutState(shadow→warn→block)</code> × confidence/status 강등. break-glass는 <code>block-overridden</code> 게이트 상태</td>
+</tr>
+<tr>
+<td><strong>P10</strong></td>
+<td>외부 계약은 규칙 밖에서 IR에 주입한다 (제약 D·F)</td>
+<td><code>ContractBinder</code> 단계가 <code>contractCatalog</code>를 읽어 <code>binding.contract</code>를 채운다. 규칙은 순수성을 유지하고 계약 조회 I/O를 하지 않는다</td>
+</tr>
+</tbody>
+</table>
+<h3 id="0-4-1단계-진짜-롱폴-리스크-격상-세-렌즈-공통-교정" class="hd"><a class="anchor" href="#0-4-1단계-진짜-롱폴-리스크-격상-세-렌즈-공통-교정" aria-label="anchor">#</a>0.4 1단계 진짜 롱폴 리스크 격상 (세 렌즈 공통 교정)</h3>
+<p>세 안 모두 &quot;빈 L3&quot;를 헤드라인으로 삼았으나, <strong>실제 1단계 롱폴 리스크는 L1→L2 Semantic Promoter</strong>다 (off-the-shelf 불가, day-1 필수, required/intent/label 휴리스틱이 confidence 값의 출처인데 세 안 모두 미명세). 본 문서는 이를 1순위 리스크로 격상하고 (§3.5) 알고리즘을 명세하며, <code>confidence</code>/<code>unknown</code>을 그 출력의 1급 필드로 강제하고, 입력형식별 어댑테이션 훅을 남겨 FHIR/DOM 시맨틱 분기로 인한 2단계 잠재 재작업을 선제 흡수한다.</p>
+<hr>
+<h2 id="1-시스템-컨텍스트-데이터-흐름" class="hd"><a class="anchor" href="#1-시스템-컨텍스트-데이터-흐름" aria-label="anchor">#</a>1. 시스템 컨텍스트 &amp; 데이터 흐름</h2>
+<h3 id="1-1-시스템-컨텍스트" class="hd"><a class="anchor" href="#1-1-시스템-컨텍스트" aria-label="anchor">#</a>1.1 시스템 컨텍스트</h3>
+<pre class="hljs plain"><code>┌──── 외부 행위자 ────────────────────────────────────────────────────────────┐
+│  AI 생성기(카카오/LLM)   병원 CI/CD            병원 거버넌스 위원회             │
+│   → 아티팩트              → verify 호출         → 룰 승인·rollout 정책·차단권    │
+│   (HTML/TSX/JSON/번들)    (GitHub/GitLab)       (제약 E·H)                     │
+└──────┬───────────────────────┬────────────────────────┬─────────────────────┘
+       │ artifact + tenantId    │ exit code + report      │ approval / policy
+       ▼                        ▼                         ▼
+┌──── 소프트보울 플랫폼 (멀티테넌트, 제약 G) ──────────────────────────────────┐
+│                                                                              │
+│  L1 어댑터        L2 IR              L3 규칙엔진       L4 출력                 │
+│  ┌─────────┐    ┌──────────────┐   ┌───────────┐   ┌─────────────┐         │
+│  │ Capture │───▶│ LIFT → L1    │──▶│ 순수함수    │──▶│ Report +     │         │
+│  │ (어댑터) │    │ Normalize→fc │   │ 룰 평가     │   │ Gate 결정    │         │
+│  │         │    │ Promote → L2 │   │ +facts[]   │   │ (CI 통과/차단)│         │
+│  └─────────┘    │ Bind  → L2.c │   └─────▲─────┘   └──────┬──────┘         │
+│                 │ Annotate→ L3 │         │                │                 │
+│                 │ (1단계 비움) │         │                │                 │
+│                 └──────────────┘         │  L5 룰저장소 ───┘                 │
+│                  provenance/conf/unknown │  (룰+버전+승인+IP보호)            │
+│                  + tenantId (루트)        │                ▼                 │
+│                                          ▼   ════ 감사추적 버스 ════         │
+│                                              (불변, append-only, prevHash)    │
+└──────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="1-2-종단-데이터-흐름-1-verification-run" class="hd"><a class="anchor" href="#1-2-종단-데이터-흐름-1-verification-run" aria-label="anchor">#</a>1.2 종단 데이터 흐름 (1 Verification Run)</h3>
+<p>데이터는 **단방향(왼→오)**으로만 흐른다. 어댑터는 규칙을 모르고, 규칙은 어댑터를 모른다 — 둘 다 IR만 안다.</p>
+<blockquote>
+<p><strong>검토 교정(Promoter↔facts 순서 모순 해소):</strong> v1은 4.PROMOTE 가 6.NORMALIZE 보다 앞서면서도 Promoter가 facts를 소비했다(<code>promote(l1, facts, hook)</code>). 확정본은 <strong>외부엔진 정규화(NORMALIZE)를 LIFT 직후, PROMOTE 직전으로 당긴다.</strong> Promoter는 항상 완성된 <code>facts[]</code>를 입력으로 받는다. 또한 계약기반 정합성을 위해 <strong>BIND(ContractBinder)</strong> 단계를 PROMOTE 뒤에 신설한다.</p>
+</blockquote>
+<pre class="hljs plain"><code>1. INGEST    artifact + RunContext{tenantId, repo, commit, ruleSetPin} 수신 → Run 생성
+                inputDigest = sha256(정규화된 아티팩트 바이트 ‖ ruleSetPin ‖ irSchemaVersion)
+2. CAPTURE   어댑터 detect() → capture(): Capture{domSnapshot|ast|declarative}
+                런타임 경로면 Playwright 마운트 (MountSpec로 비결정성 봉인)
+                scenarios[]: 빈 폼/검증에러/로딩 등 복수 상태 캡처 (제약 C 상태폭발 대응)
+3. LIFT      Capture → L1 StructureGraph (어댑터 물성을 여기서 균질화, 결정적 nodeId 부여 §3.2.1)
+4. NORMALIZE 외부엔진(axe-core 등) 실행 → facts[]:ExternalFact (L1 nodeId에 결합, measurable 플래그)
+5. PROMOTE   (L1, facts) → L2 SemanticOverlay (Semantic Promoter: 폼·역할·바인딩 추론 + confidence/status)
+6. BIND      ContractBinder(L2, contractCatalog[tenant]) → binding.contract 채움 (scope=contract 승격)
+                계약 미발견·미매칭은 binding.contract.status='unknown' (fail-open 아님: 정합성 룰이 unknown 처리)
+7. ANNOTATE  L2 → L3 DomainAnnotation (3단계만; 1단계 no-op, 빈 배열)
+8. EVALUATE  활성 룰셋(tenant별, version-pinned) → 각 Rule.evaluate(IR, ctx) 순수 평가
+                requires 미충족 레이어 의존 룰 자동 skip / confidence+status gating 적용
+                모든 Violation에 authority 부착 (없으면 fail-closed)
+9. DEDUP     교차 시나리오 Finding 합성·중복제거 (§3.7) → 1 Finding = (ruleId, stableNodeKey)
+10. GATE     유효심각도 = severity × rolloutState × (confidence/status 강등), break-glass 적용 → Gate Decision
+11. EMIT     Report(개발자용 + SARIF) + CI exit code(§5.2) + 불변 Audit 레코드(prevHash 체인)
+</code></pre>
+<p><strong>핵심 불변식</strong>: 3~7에서 생성된 IR은 8에서 <strong>불변(read-only)</strong>. 규칙은 IR을 변경 못 한다. 모든 Violation은 10으로 가기 전 <code>authority</code>(외부 권위 인용)를 갖는다 — 없으면 파이프라인 fail (fail-closed on missing provenance).</p>
+<hr>
+<h2 id="2-l1-입력-어댑터" class="hd"><a class="anchor" href="#2-l1-입력-어댑터" aria-label="anchor">#</a>2. L1 입력 어댑터</h2>
+<h3 id="2-1-책임-경계-capture-lift-층화-c에서-접목" class="hd"><a class="anchor" href="#2-1-책임-경계-capture-lift-층화-c에서-접목" aria-label="anchor">#</a>2.1 책임 경계 (Capture/LIFT 층화 — C에서 접목)</h3>
+<p>어댑터의 유일한 책임은 <strong>정규화된 Capture 생성</strong>이다. 어댑터는 IR(L1)을 만들지 않는다. 이는 렌즈2가 집어낸 세 안 공통의 가장 심각한 누수 추상화를 메운다: A/B처럼 &quot;어댑터=L1생성&quot;으로 두면 <code>L1Node.contrastRatio</code>·<code>a11y</code> 같은 필드가 &quot;런타임 경로에서만 채워지는&quot; 조건부 필드가 되어 <strong>어댑터 물성이 L1 스키마의 채워짐/비워짐 패턴으로 직접 누수</strong>된다. Capture 중간 경계 한 겹이 이를 봉인하고, LIFT가 균질한 L1을 생성한다.</p>
+<h3 id="2-2-인터페이스-1일차-동결-이후-불변" class="hd"><a class="anchor" href="#2-2-인터페이스-1일차-동결-이후-불변" aria-label="anchor">#</a>2.2 인터페이스 (1일차 동결, 이후 불변)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">InputAdapter</span> {
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span>;                    <span class="hljs-comment">// &quot;dom-snapshot&quot; | &quot;fhir-questionnaire&quot; | &quot;tsx-static&quot;</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">kind</span>: <span class="hljs-title class_">CaptureKind</span>;             <span class="hljs-comment">// &#x27;runtime-dom&#x27; | &#x27;declarative&#x27; | &#x27;source-ast&#x27;</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">priority</span>: <span class="hljs-built_in">number</span>;              <span class="hljs-comment">// 동일 입력 다중 매칭 시 선택 순서</span>
+
+  <span class="hljs-title function_">detect</span>(<span class="hljs-attr">artifact</span>: <span class="hljs-title class_">ArtifactDescriptor</span>): <span class="hljs-title class_">MatchScore</span>;   <span class="hljs-comment">// 0..1, 0 = 처리 불가</span>
+
+  <span class="hljs-title function_">capture</span>(<span class="hljs-attr">artifact</span>: <span class="hljs-title class_">ArtifactRef</span>, <span class="hljs-attr">ctx</span>: <span class="hljs-title class_">CaptureContext</span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-title class_">CaptureResult</span>&gt;;  <span class="hljs-comment">// L1 아님, Capture만</span>
+}
+
+<span class="hljs-comment">// 검토 교정: capture는 실패를 throw가 아닌 값으로 반환 → exit-code 2(도구오류) 결정성 확보</span>
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">CaptureResult</span> =
+  | { <span class="hljs-attr">ok</span>: <span class="hljs-literal">true</span>; <span class="hljs-attr">capture</span>: <span class="hljs-title class_">Capture</span> }
+  | { <span class="hljs-attr">ok</span>: <span class="hljs-literal">false</span>; <span class="hljs-attr">error</span>: <span class="hljs-title class_">CaptureError</span> };   <span class="hljs-comment">// mount-failed | build-broken | unsupported | timeout</span>
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">CaptureError</span> { <span class="hljs-attr">code</span>: <span class="hljs-title class_">CaptureErrorCode</span>; <span class="hljs-attr">message</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">partial</span>?: <span class="hljs-title class_">Capture</span>; }
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">CaptureErrorCode</span> = <span class="hljs-string">&#x27;mount-failed&#x27;</span> | <span class="hljs-string">&#x27;build-broken&#x27;</span> | <span class="hljs-string">&#x27;unsupported&#x27;</span> | <span class="hljs-string">&#x27;timeout&#x27;</span> | <span class="hljs-string">&#x27;detect-miss&#x27;</span>;
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ArtifactRef</span> =
+  | { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;url&#x27;</span>; <span class="hljs-attr">url</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">mount</span>?: <span class="hljs-title class_">MountSpec</span> }
+  | { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;html&#x27;</span>; <span class="hljs-attr">html</span>: <span class="hljs-built_in">string</span> }
+  | { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;bundle&#x27;</span>; <span class="hljs-attr">entry</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">files</span>: <span class="hljs-title class_">VirtualFile</span>[]; <span class="hljs-attr">mount</span>?: <span class="hljs-title class_">MountSpec</span> }
+  | { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;tsx-source&#x27;</span>; <span class="hljs-attr">files</span>: <span class="hljs-title class_">VirtualFile</span>[] }
+  | { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;json-spec&#x27;</span>; <span class="hljs-attr">spec</span>: <span class="hljs-built_in">unknown</span>; <span class="hljs-attr">schemaHint</span>?: <span class="hljs-string">&#x27;fhir-questionnaire&#x27;</span> };
+
+<span class="hljs-comment">// 비결정성 봉인 (A에서 접목 — P7) — 재현성 = 감사 가능성</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">MountSpec</span> {
+  <span class="hljs-attr">seed</span>: <span class="hljs-built_in">number</span>;                           <span class="hljs-comment">// 난수 시드 고정 (기본 42)</span>
+  <span class="hljs-attr">fixtures</span>?: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">unknown</span>&gt;;     <span class="hljs-comment">// API/데이터 모킹</span>
+  <span class="hljs-attr">viewport</span>: { <span class="hljs-attr">width</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">height</span>: <span class="hljs-built_in">number</span> };
+  <span class="hljs-attr">waitFor</span>: <span class="hljs-string">&#x27;networkidle&#x27;</span> | { <span class="hljs-attr">selector</span>: <span class="hljs-built_in">string</span> } | { <span class="hljs-attr">ms</span>: <span class="hljs-built_in">number</span> };
+  <span class="hljs-attr">locale</span>?: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-comment">// 복수 상태 캡처 (C에서 접목 — 상태폭발 대응, 제약 C)</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">CaptureContext</span> {
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;                     <span class="hljs-comment">// P8: day-0 1급</span>
+  <span class="hljs-attr">mount</span>?: <span class="hljs-title class_">MountSpec</span>;
+  <span class="hljs-attr">scenarios</span>: <span class="hljs-title class_">ScenarioSpec</span>[];              <span class="hljs-comment">// [{id:&#x27;empty&#x27;}, {id:&#x27;validation-error&#x27;, interactions:[...]}, {id:&#x27;loading&#x27;}]</span>
+  <span class="hljs-attr">timeoutMs</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Capture</span> {
+  <span class="hljs-attr">captureKind</span>: <span class="hljs-title class_">CaptureKind</span>;
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;
+  <span class="hljs-attr">scenarios</span>: <span class="hljs-title class_">CapturedScenario</span>[];          <span class="hljs-comment">// 상태별 캡처 — 미캡처 분기는 LIFT가 unknown 노드로 보완</span>
+  <span class="hljs-attr">captureProvenance</span>: {                    <span class="hljs-comment">// 감사: 이 캡처가 어떻게 만들어졌나</span>
+    <span class="hljs-attr">adapterId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">adapterVersion</span>: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;rendered&#x27;</span> | <span class="hljs-string">&#x27;parsed&#x27;</span> | <span class="hljs-string">&#x27;declarative&#x27;</span>;
+    <span class="hljs-attr">engine</span>?: <span class="hljs-built_in">string</span>;                      <span class="hljs-comment">// &quot;playwright@1.4x / chromium-12x&quot;</span>
+    <span class="hljs-attr">mountSpecDigest</span>?: <span class="hljs-built_in">string</span>;             <span class="hljs-comment">// 재현성 키</span>
+  };
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">CapturedScenario</span> {
+  <span class="hljs-attr">scenarioId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">domSnapshot</span>?: <span class="hljs-title class_">SerializedDOM</span>;            <span class="hljs-comment">// 런타임: outerHTML + computedStyles + a11yTree + focusOrder</span>
+  <span class="hljs-attr">ast</span>?: <span class="hljs-title class_">SourceAST</span>;                        <span class="hljs-comment">// 정적: best-effort AST</span>
+  <span class="hljs-attr">declarative</span>?: <span class="hljs-title class_">JsonDocument</span>;             <span class="hljs-comment">// 선언적: FHIR Questionnaire 등</span>
+  <span class="hljs-attr">stablePath</span>: <span class="hljs-title class_">StablePathMap</span>;              <span class="hljs-comment">// 각 캡처 노드 → 결정적 안정경로(§3.2.1) — nodeId 생성 입력</span>
+  <span class="hljs-attr">sourceMap</span>: <span class="hljs-title class_">SourceMap</span>;                   <span class="hljs-comment">// 각 캡처 노드 → 원본(file:line:col 또는 domPath)</span>
+}
+</code></pre>
+<h3 id="2-3-입력-경로-우선순위-제약-c" class="hd"><a class="anchor" href="#2-3-입력-경로-우선순위-제약-c" aria-label="anchor">#</a>2.3 입력 경로 우선순위 (제약 C)</h3>
+<table>
+<thead>
+<tr>
+<th>입력</th>
+<th>1차 경로</th>
+<th>어댑터</th>
+<th>단계</th>
+<th>confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>렌더 DOM / 라이브 URL</td>
+<td><strong>런타임 DOM 스냅샷</strong></td>
+<td><code>dom-snapshot</code></td>
+<td>1</td>
+<td>관측 1.0</td>
+</tr>
+<tr>
+<td>React/TSX 번들</td>
+<td><strong>런타임 마운트 후 스냅샷</strong></td>
+<td><code>dom-snapshot</code>(mount)</td>
+<td>1</td>
+<td>관측 1.0</td>
+</tr>
+<tr>
+<td>선언적 JSON (FHIR Questionnaire)</td>
+<td>직접 매핑 (마운트 불요)</td>
+<td><code>fhir-questionnaire</code></td>
+<td>2</td>
+<td>1.0</td>
+</tr>
+<tr>
+<td>TSX 소스 (마운트 불가)</td>
+<td>정적 AST (보조)</td>
+<td><code>tsx-static</code></td>
+<td>2~3</td>
+<td>&lt;1, 미해소=unknown</td>
+</tr>
+</tbody>
+</table>
+<p><strong>왜 런타임 DOM이 1차인가</strong>: 임의 React의 정적 트리화는 props 분기·<code>map</code>·<code>context</code>·런타임 데이터 의존으로 일반해가 없다(제약 C). 런타임 마운트는 이를 <em>실행</em>으로 우회하며 동시에 (a) 계산된 대비비, (b) 실제 탭 포커스 순서, (c) 접근성 트리를 공짜로 얻어 1단계 접근성 룰을 정확히 평가하고 axe-core를 재사용한다.</p>
+<h3 id="2-4-어댑터-추가-방법" class="hd"><a class="anchor" href="#2-4-어댑터-추가-방법" aria-label="anchor">#</a>2.4 어댑터 추가 방법</h3>
+<ol>
+<li><code>InputAdapter</code> 구현 (<code>id</code>/<code>kind</code>/<code>priority</code>/<code>detect</code>/<code>capture</code>).</li>
+<li>레지스트리 등록 (pnpm 워크스페이스 자동 디스커버리).</li>
+<li>골든 픽스처(입력 → 기대 Capture, <strong>결정적 nodeId 포함</strong>) 추가.
+→ <strong>IR·LIFT·규칙 코드 변경 0</strong> (제약 G). <code>detect</code> 점수 최고 어댑터 선택, 동률/저신뢰는 <code>unknown</code> provenance 남기고 명시적 <code>CaptureResult{ok:false}</code> 반환(예외 throw 금지 — exit-code 결정성).</li>
+</ol>
+<hr>
+<h2 id="3-l2-ir-다층-스키마-구체-예시-설계의-심장" class="hd"><a class="anchor" href="#3-l2-ir-다층-스키마-구체-예시-설계의-심장" aria-label="anchor">#</a>3. L2 IR — 다층 스키마 + 구체 예시 (설계의 심장)</h2>
+<h3 id="3-1-다층-구조-제약-b-단일-평면-트리-금지" class="hd"><a class="anchor" href="#3-1-다층-구조-제약-b-단일-평면-트리-금지" aria-label="anchor">#</a>3.1 다층 구조 (제약 B: 단일 평면 트리 금지)</h3>
+<p>세 레이어는 <strong>별도 그래프</strong>이며 <code>nodeId</code> 참조로만 결합한다. 한 노드가 렌더구조·폼시맨틱·바인딩·의료시맨틱을 동시에 들지 않는다.</p>
+<pre class="hljs plain"><code>L1 StructureGraph   : 렌더 구조 사실(fact)만. LIFT가 생성. confidence=1.0(관측)
+        │ nodeId 참조
+        ▼
+L2 SemanticOverlay  : 폼/역할/상호작용/바인딩. Promoter 추론 + ContractBinder 보강. confidence&lt;1 가능
+        │ nodeId 참조
+        ▼
+L3 DomainAnnotation : 의료 시맨틱(코드체계·단위·규격대조). 1단계 빈 배열. 3단계 채움
+</code></pre>
+<h3 id="3-2-공통-메타-모든-레이어-노드-1급-필드-제약-b" class="hd"><a class="anchor" href="#3-2-공통-메타-모든-레이어-노드-1급-필드-제약-b" aria-label="anchor">#</a>3.2 공통 메타 (모든 레이어 노드 1급 필드 — 제약 B)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">type</span> <span class="hljs-title class_">NodeId</span> = <span class="hljs-built_in">string</span>;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">TriBool</span> = <span class="hljs-literal">true</span> | <span class="hljs-literal">false</span> | <span class="hljs-string">&#x27;unknown&#x27;</span>;      <span class="hljs-comment">// B에서 접목 — P6</span>
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">NodeStatus</span> = <span class="hljs-string">&#x27;known&#x27;</span> | <span class="hljs-string">&#x27;unknown&#x27;</span> | <span class="hljs-string">&#x27;ambiguous&#x27;</span>;
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">NodeMeta</span> {
+  <span class="hljs-attr">nodeId</span>: <span class="hljs-title class_">NodeId</span>;                <span class="hljs-comment">// 결정적 생성 — §3.2.1</span>
+  <span class="hljs-attr">provenance</span>: <span class="hljs-title class_">Provenance</span>;        <span class="hljs-comment">// 소스맵 — 1급 필수 (수정위치·감사 근거)</span>
+  <span class="hljs-attr">confidence</span>: <span class="hljs-built_in">number</span>;            <span class="hljs-comment">// 0..1. L1=1.0(관측), L2/L3=추론값</span>
+  <span class="hljs-attr">status</span>: <span class="hljs-title class_">NodeStatus</span>;            <span class="hljs-comment">// unknown/ambiguous 1급 (null과 구분) — 게이트까지 전파</span>
+  <span class="hljs-attr">derivedFrom</span>: <span class="hljs-title class_">NodeId</span>[];         <span class="hljs-comment">// C에서 접목 — 레이어 간 근거 체인 (provenance 역추적)</span>
+  <span class="hljs-attr">scenarioCoverage</span>: <span class="hljs-built_in">string</span>[];    <span class="hljs-comment">// 어느 scenario에서 관측됐나 (상태폭발 추적)</span>
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Provenance</span> {
+  <span class="hljs-attr">source</span>: { <span class="hljs-attr">file</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">line</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">col</span>: <span class="hljs-built_in">number</span> } | { <span class="hljs-attr">domPath</span>: <span class="hljs-built_in">string</span> };
+  <span class="hljs-attr">captureId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">scenarioId</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-comment">// 단일 IR 패키지가 박는 루트 — B에서 접목</span>
+<span class="hljs-keyword">interface</span> IR {
+  <span class="hljs-attr">irSchemaVersion</span>: <span class="hljs-built_in">string</span>;       <span class="hljs-comment">// 경계 드리프트 컴파일타임 차단</span>
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;            <span class="hljs-comment">// P8: day-0 타입 강제</span>
+  <span class="hljs-attr">runId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">inputDigest</span>: <span class="hljs-built_in">string</span>;           <span class="hljs-comment">// 재현성 1급 (P7)</span>
+  <span class="hljs-attr">l1</span>: L1Graph;
+  <span class="hljs-attr">l2</span>: L2Overlay[];
+  <span class="hljs-attr">l3</span>: L3Annotation[];            <span class="hljs-comment">// 1단계 = []</span>
+  <span class="hljs-attr">facts</span>: <span class="hljs-title class_">ExternalFact</span>[];         <span class="hljs-comment">// axe-core 등 정규화 (A에서 접목)</span>
+}
+</code></pre>
+<h4 id="3-2-1-결정적-nodeid-생성-규약-검토-high-3-해소-조인-dedup-키의-토대" class="hd"><a class="anchor" href="#3-2-1-결정적-nodeid-생성-규약-검토-high-3-해소-조인-dedup-키의-토대" aria-label="anchor">#</a>3.2.1 결정적 <code>nodeId</code> 생성 규약 (검토 high-3 해소 — 조인/dedup 키의 토대)</h4>
+<p><code>nodeId</code>는 레이어 결합·교차 시나리오 dedup·골든 스냅샷의 <strong>유일한 부하 지지 키</strong>다. 생성·안정성 규칙이 없으면 결정성과 골든 스냅샷이 무너진다. 다음을 1일차 동결한다.</p>
+<ul>
+<li><strong>생성 함수(결정적, 순수):</strong>
+<code>nodeId = &quot;{layer}:{sha1(tenantId ‖ stablePath)}.slice(0,12)&quot;</code>
+<ul>
+<li><code>layer ∈ {l1,l2,l3}</code>. L2/L3 노드는 자신이 <code>derivedFrom</code>하는 L1 노드의 <code>stablePath</code>를 시드로 사용해 결합을 결정적으로 만든다.</li>
+<li><code>stablePath</code>(StablePathMap)는 <strong>시나리오 불변(scenario-invariant) 구조 경로</strong>다. 런타임 DOM은 <code>tag</code> 시퀀스 + 안정 속성(<code>id</code>/<code>name</code>/<code>data-testid</code>) + 형제 인덱스의 정규화 경로(예: <code>form&gt;select[name=order.drug]</code>). 시나리오별로 달라지는 휘발 속성(<code>value</code>, <code>aria-expanded</code>, 포커스 상태)은 경로에서 제외한다.</li>
+</ul>
+</li>
+<li><strong>교차 시나리오 안정성(stableNodeKey):</strong> 같은 구조 노드는 모든 scenario에서 **동일 <code>nodeId</code>**를 갖는다(시드가 시나리오 불변이므로). 이것이 §3.7 dedup의 키다. 시나리오에서만 등장하는 노드(예: <code>validation-error</code>에서만 나타나는 에러 메시지)는 자신의 <code>stablePath</code>로 고유 id를 얻고 <code>scenarioCoverage</code>로 출처가 추적된다.</li>
+<li><strong>재실행 안정성:</strong> <code>(입력, ruleSetPin, irSchemaVersion)</code>가 같으면 <code>nodeId</code> 집합이 비트 동일. MountSpec.seed 고정이 DOM 순서 안정성을 보장한다.</li>
+<li><strong>충돌 처리:</strong> 동일 <code>stablePath</code>가 둘 이상이면(드물게 익명 형제) 정규화 경로에 <strong>결정적 형제 서수</strong>를 append(<code>...&gt;div[2]</code>)해 충돌 해소. 무작위 카운터 금지(재실행 비결정성 유발).</li>
+<li><strong>불안정 입력 표기:</strong> 안정 앵커(<code>id</code>/<code>name</code>/<code>testid</code>)가 전혀 없어 경로가 형제 인덱스에만 의존하는 노드는 <code>nodeMeta.status</code>에 영향은 없으나 <code>provenance</code>에 <code>pathStability:'index-only'</code>를 남겨 골든 스냅샷 검토자가 취약 경로를 식별하게 한다.</li>
+</ul>
+<h3 id="3-3-레이어별-노드-타입" class="hd"><a class="anchor" href="#3-3-레이어별-노드-타입" aria-label="anchor">#</a>3.3 레이어별 노드 타입</h3>
+<pre class="hljs"><code><span class="hljs-comment">// ── L1: 구조 그래프 (LIFT 생성, 사실만) ──</span>
+<span class="hljs-keyword">interface</span> L1Node <span class="hljs-keyword">extends</span> <span class="hljs-title class_">NodeMeta</span> {
+  <span class="hljs-attr">tag</span>: <span class="hljs-built_in">string</span>;                              <span class="hljs-comment">// &#x27;input&#x27;,&#x27;button&#x27;,&#x27;div&#x27;</span>
+  <span class="hljs-attr">attributes</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">string</span>&gt;;
+  <span class="hljs-attr">text</span>?: <span class="hljs-built_in">string</span>;
+  <span class="hljs-comment">// 측정값 — 가용성을 1급으로 (렌즈2 누수 교정): 정적 경로는 measured:false</span>
+  <span class="hljs-attr">computed</span>?: {
+    <span class="hljs-attr">contrast</span>?: <span class="hljs-title class_">Measured</span>&lt;<span class="hljs-built_in">number</span>&gt;;            <span class="hljs-comment">// {value, measured} — &#x27;미측정&#x27;과 &#x27;통과&#x27; 구분</span>
+    <span class="hljs-attr">focusable</span>?: <span class="hljs-title class_">Measured</span>&lt;<span class="hljs-built_in">boolean</span>&gt;;
+    <span class="hljs-attr">tabOrder</span>?: <span class="hljs-title class_">Measured</span>&lt;<span class="hljs-built_in">number</span>&gt;;
+    <span class="hljs-attr">fontSizePx</span>?: <span class="hljs-title class_">Measured</span>&lt;<span class="hljs-built_in">number</span>&gt;;
+  };
+  <span class="hljs-attr">a11y</span>?: { <span class="hljs-attr">role</span>?: <span class="hljs-built_in">string</span>; <span class="hljs-attr">name</span>?: <span class="hljs-title class_">Measured</span>&lt;<span class="hljs-built_in">string</span>&gt; };
+  <span class="hljs-attr">children</span>: <span class="hljs-title class_">NodeId</span>[];
+}
+<span class="hljs-comment">// 측정 가용성 1급화 — 렌즈2 미해결난제(2) 해소</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Measured</span>&lt;T&gt; { <span class="hljs-attr">value</span>: T | <span class="hljs-literal">null</span>; <span class="hljs-attr">measured</span>: <span class="hljs-built_in">boolean</span>; }   <span class="hljs-comment">// measured:false = 이 경로로 측정 불가</span>
+<span class="hljs-keyword">interface</span> L1Graph { <span class="hljs-attr">rootId</span>: <span class="hljs-title class_">NodeId</span>; <span class="hljs-attr">nodes</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-title class_">NodeId</span>, L1Node&gt;; }
+
+<span class="hljs-comment">// ── L2: 시맨틱 오버레이 (폼·역할·바인딩) ──</span>
+<span class="hljs-keyword">type</span> L2Overlay = <span class="hljs-title class_">NodeMeta</span> &amp; (
+  | { <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;Form&#x27;</span>; <span class="hljs-attr">fields</span>: <span class="hljs-title class_">NodeId</span>[]; <span class="hljs-attr">actions</span>: <span class="hljs-title class_">NodeId</span>[] }
+  | { <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;Field&#x27;</span>; <span class="hljs-attr">label</span>: <span class="hljs-built_in">string</span> | <span class="hljs-literal">null</span>; <span class="hljs-attr">required</span>: <span class="hljs-title class_">TriBool</span>;
+      <span class="hljs-attr">dataType</span>: <span class="hljs-string">&#x27;string&#x27;</span>|<span class="hljs-string">&#x27;number&#x27;</span>|<span class="hljs-string">&#x27;date&#x27;</span>|<span class="hljs-string">&#x27;code&#x27;</span>|<span class="hljs-string">&#x27;quantity&#x27;</span>|<span class="hljs-string">&#x27;boolean&#x27;</span>|<span class="hljs-string">&#x27;unknown&#x27;</span>;
+      <span class="hljs-attr">binding</span>?: <span class="hljs-title class_">BindingDescriptor</span> }
+  | { <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;Action&#x27;</span>; <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;submit&#x27;</span>|<span class="hljs-string">&#x27;cancel&#x27;</span>|<span class="hljs-string">&#x27;destructive&#x27;</span>|<span class="hljs-string">&#x27;navigate&#x27;</span>|<span class="hljs-string">&#x27;unknown&#x27;</span>; <span class="hljs-attr">target</span>?: <span class="hljs-built_in">string</span> }
+  | { <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;Display&#x27;</span>; <span class="hljs-attr">binding</span>?: <span class="hljs-title class_">BindingDescriptor</span> }
+);
+
+<span class="hljs-comment">// ── 바인딩 디스크립터 — 단위·코드체계 슬롯 (제약 D) ──</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">BindingDescriptor</span> {
+  <span class="hljs-attr">scope</span>: <span class="hljs-string">&#x27;ui-internal&#x27;</span> | <span class="hljs-string">&#x27;contract&#x27;</span>;        <span class="hljs-comment">// 폐쇄형 vs 계약기반 공식 분리 (제약 D)</span>
+  <span class="hljs-attr">path</span>: <span class="hljs-built_in">string</span>;                             <span class="hljs-comment">// &quot;order.dose&quot;</span>
+  <span class="hljs-attr">observedType</span>?: <span class="hljs-built_in">string</span>;                    <span class="hljs-comment">// 폐쇄형 정합성용 (UI 내부 관측)</span>
+  <span class="hljs-attr">unit</span>?: { <span class="hljs-attr">system</span>: <span class="hljs-string">&#x27;UCUM&#x27;</span>; <span class="hljs-attr">code</span>?: <span class="hljs-built_in">string</span>; <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;known&#x27;</span>|<span class="hljs-string">&#x27;unknown&#x27;</span> };           <span class="hljs-comment">// UCUM 슬롯</span>
+  <span class="hljs-attr">codeSystem</span>?: { <span class="hljs-attr">system</span>: <span class="hljs-string">&#x27;LOINC&#x27;</span>|<span class="hljs-string">&#x27;RxNorm&#x27;</span>|<span class="hljs-string">&#x27;SNOMED&#x27;</span>|<span class="hljs-string">&#x27;ICD10&#x27;</span>; <span class="hljs-attr">code</span>?: <span class="hljs-built_in">string</span>; <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;known&#x27;</span>|<span class="hljs-string">&#x27;unknown&#x27;</span> };
+  <span class="hljs-comment">// ContractBinder가 채우는 슬롯 (§3.6) — Promoter는 비워둠</span>
+  <span class="hljs-attr">contract</span>?: {
+    <span class="hljs-attr">schema</span>: <span class="hljs-string">&#x27;FHIR&#x27;</span>|<span class="hljs-string">&#x27;OpenAPI&#x27;</span>; <span class="hljs-attr">resource</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">element</span>: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;known&#x27;</span> | <span class="hljs-string">&#x27;unknown&#x27;</span>;            <span class="hljs-comment">// 계약 미발견/미매칭 = unknown (정합성 룰이 처리)</span>
+    <span class="hljs-attr">contractRef</span>?: <span class="hljs-built_in">string</span>;                   <span class="hljs-comment">// 카탈로그 내 계약 식별자 + 버전</span>
+  };
+}
+
+<span class="hljs-comment">// ── L3: 도메인 주석 (3단계, 1단계 빈 배열) ──</span>
+<span class="hljs-keyword">type</span> L3Annotation = <span class="hljs-title class_">NodeMeta</span> &amp; {
+  <span class="hljs-attr">appliesTo</span>: <span class="hljs-title class_">NodeId</span>;                        <span class="hljs-comment">// L2 노드 참조</span>
+  <span class="hljs-attr">clinicalConcept</span>?: { <span class="hljs-attr">system</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">code</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">display</span>: <span class="hljs-built_in">string</span> };
+  <span class="hljs-attr">contractMatch</span>?: {
+    <span class="hljs-attr">contractRef</span>: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">matched</span>: <span class="hljs-built_in">boolean</span>;
+    <span class="hljs-attr">authority</span>: <span class="hljs-title class_">AuthorityRef</span>;                <span class="hljs-comment">// ★ 외부 권위 강제 (제약 E)</span>
+  };
+};
+</code></pre>
+<h3 id="3-4-외부-사실-facts-스키마-axe-facts-매핑-명세-검토-thin-해소" class="hd"><a class="anchor" href="#3-4-외부-사실-facts-스키마-axe-facts-매핑-명세-검토-thin-해소" aria-label="anchor">#</a>3.4 외부 사실(facts) 스키마 (axe→facts 매핑 명세 — 검토 thin 해소)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">ExternalFact</span> {
+  <span class="hljs-attr">engine</span>: <span class="hljs-built_in">string</span>;                           <span class="hljs-comment">// &quot;axe-core@4.x&quot;</span>
+  <span class="hljs-attr">ruleId</span>: <span class="hljs-built_in">string</span>;                           <span class="hljs-comment">// 엔진 native 룰 id (&quot;label&quot;,&quot;color-contrast&quot;)</span>
+  <span class="hljs-attr">appliesTo</span>: <span class="hljs-title class_">NodeId</span>;                        <span class="hljs-comment">// L1 nodeId — axe target → DOM node → stablePath → nodeId</span>
+  <span class="hljs-attr">impact</span>: <span class="hljs-string">&#x27;minor&#x27;</span>|<span class="hljs-string">&#x27;moderate&#x27;</span>|<span class="hljs-string">&#x27;serious&#x27;</span>|<span class="hljs-string">&#x27;critical&#x27;</span>;
+  <span class="hljs-attr">measurable</span>: <span class="hljs-built_in">boolean</span>;                      <span class="hljs-comment">// 이 입력 경로에서 측정 가능했나 (정적=false 가능)</span>
+  <span class="hljs-attr">observed</span>: <span class="hljs-title class_">Record</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-built_in">unknown</span>&gt;;        <span class="hljs-comment">// {accessibleName:&quot;&quot;} | {ratio:1.6, required:4.5}</span>
+  <span class="hljs-attr">scenarioId</span>: <span class="hljs-built_in">string</span>;                       <span class="hljs-comment">// 어느 상태에서 관측됐나</span>
+}
+</code></pre>
+<p><strong>axe→facts 매핑 규약(NORMALIZE 단계):</strong> axe-core 결과의 각 <code>node.target</code>(CSS 셀렉터)을 캡처 시점의 DOM 노드로 역참조하고, 그 노드의 <code>stablePath</code>로 L1 <code>nodeId</code>를 얻어 <code>appliesTo</code>에 결합한다. axe target이 복수 노드를 가리키면 각각 별도 fact로 분해한다. axe <code>incomplete</code>(판정 불가) 결과는 <code>measurable:true, observed:{result:'incomplete'}</code>로 보존하여 규칙이 unknown으로 처리하게 한다 — 누락(silent drop) 금지.</p>
+<h3 id="3-5-1순위-리스크-semantic-promoter-알고리즘-명세-세-안-공통-사각-해소" class="hd"><a class="anchor" href="#3-5-1순위-리스크-semantic-promoter-알고리즘-명세-세-안-공통-사각-해소" aria-label="anchor">#</a>3.5 1순위 리스크: Semantic Promoter 알고리즘 명세 (세 안 공통 사각 해소)</h3>
+<p>L1→L2 추론은 day-1 필수이며 off-the-shelf가 불가능하다. <strong>입력은 항상 (L1, facts)</strong> — facts는 NORMALIZE에서 이미 완성됨(§1.2 순서 교정).</p>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">SemanticPromoter</span> {
+  <span class="hljs-title function_">promote</span>(<span class="hljs-attr">l1</span>: L1Graph, <span class="hljs-attr">facts</span>: <span class="hljs-title class_">ExternalFact</span>[], <span class="hljs-attr">hook</span>: <span class="hljs-title class_">PromoterHook</span>): L2Overlay[];
+}
+<span class="hljs-comment">// 입력형식별 어댑테이션 훅 — FHIR/DOM 시맨틱 분기로 인한 2단계 재작업 선제 흡수</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">PromoterHook</span> {
+  <span class="hljs-attr">captureKind</span>: <span class="hljs-title class_">CaptureKind</span>;
+  <span class="hljs-comment">// FHIR Questionnaire는 required/dataType가 명시적(confidence 1.0), DOM은 휴리스틱(confidence&lt;1)</span>
+  fieldRequiredHint?(<span class="hljs-attr">node</span>: L1Node): <span class="hljs-title class_">TriBool</span>;
+  dataTypeHint?(<span class="hljs-attr">node</span>: L1Node): <span class="hljs-built_in">string</span> | <span class="hljs-literal">undefined</span>;
+}
+</code></pre>
+<p>추론 규칙 (DOM 경로, 각각 confidence·status 산출):</p>
+<ul>
+<li><strong>Field 식별</strong>: <code>tag∈{input,select,textarea}</code> 또는 <code>role∈{textbox,combobox,spinbutton,checkbox}</code> → Field. confidence 0.95, status <code>known</code>.</li>
+<li><strong>required</strong>: <code>attr.required</code> 또는 <code>aria-required=true</code> → <code>true</code>(0.95, known); 인접 텍스트에 <code>*</code>/&quot;필수&quot; → <code>true</code>(0.7, known); 신호 없음 → <strong><code>'unknown'</code>(미상, false 단정 금지 — P6), status <code>ambiguous</code></strong>.</li>
+<li><strong>label</strong>: <code>&lt;label for&gt;</code> 연결(0.95) &gt; <code>aria-label</code>(0.9) &gt; <code>aria-labelledby</code>(0.9) &gt; 인접 텍스트 휴리스틱(0.6, status <code>ambiguous</code>) &gt; 없음 → <code>null</code> + status <code>known</code>(확정 부재, axe label fact와 교차검증).</li>
+<li><strong>dataType</strong>: <code>input[type]</code> 직매핑(0.9); <code>inputmode</code>/<code>pattern</code> 보조(0.7); 불명 → <code>'unknown'</code>, status <code>ambiguous</code>.</li>
+<li><strong>Action.role</strong>: <code>type=submit</code> 또는 폼 내 단독 버튼(0.85); 텍스트 &quot;삭제/취소/저장&quot; 사전(0.7); 불명 → <code>'unknown'</code>, status <code>ambiguous</code>.</li>
+<li><strong>binding.path</strong>: <code>name</code>/<code>data-bind</code>/<code>id</code> 속성에서 추출(0.8); 없음 → binding 생략.</li>
+</ul>
+<p><strong>핵심 규율</strong>: 추론 불가는 반드시 <code>'unknown'</code>/<code>status:'ambiguous'</code>로 표기하고 <code>confidence</code>를 낮춘다. 이 두 신호는 §4.4의 effectiveSeverity로 직결되어 &quot;추론으로 배포를 막지 않음&quot;을 보장한다(P5).</p>
+<h3 id="3-6-contractbinder-계약기반-정합성의-실행-경로-검토-high-2-해소" class="hd"><a class="anchor" href="#3-6-contractbinder-계약기반-정합성의-실행-경로-검토-high-2-해소" aria-label="anchor">#</a>3.6 ContractBinder — 계약기반 정합성의 실행 경로 (검토 high-2 해소)</h3>
+<blockquote>
+<p><strong>검토가 지적한 결함:</strong> ADR-3은 &quot;Promoter가 계약 스키마를 IR에 주입한다&quot;고 했으나 <code>promote()</code>는 계약을 입력으로 받지 않고 어느 단계도 <code>binding.contract</code>를 채우지 않아 계약기반 정합성이 구현 불가였다. 확정본은 <strong>계약 주입 책임을 Promoter에서 분리해 전용 <code>ContractBinder</code> 단계로 이관</strong>한다(파이프라인 6.BIND). Promoter는 UI 관측만, Binder는 외부 계약 결합만 — 단일 책임이 명확해진다.</p>
+</blockquote>
+<pre class="hljs"><code><span class="hljs-comment">// contractCatalog: tenant별 외부 계약 묶음 (FHIR 프로파일/OpenAPI). 로드 소스는 룰저장소(L5)와 동일 경로.</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContractCatalog</span> {
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;
+  <span class="hljs-attr">version</span>: <span class="hljs-built_in">string</span>;                          <span class="hljs-comment">// 카탈로그 version pin (감사·재현성)</span>
+  <span class="hljs-attr">contracts</span>: <span class="hljs-title class_">ContractEntry</span>[];
+}
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContractEntry</span> {
+  <span class="hljs-attr">ref</span>: <span class="hljs-built_in">string</span>;                              <span class="hljs-comment">// &quot;fhir-r4:MedicationRequest@hospA-1.2&quot;</span>
+  <span class="hljs-attr">schema</span>: <span class="hljs-string">&#x27;FHIR&#x27;</span> | <span class="hljs-string">&#x27;OpenAPI&#x27;</span>;
+  <span class="hljs-attr">resource</span>: <span class="hljs-built_in">string</span>;                         <span class="hljs-comment">// &quot;MedicationRequest&quot;</span>
+  <span class="hljs-attr">elements</span>: <span class="hljs-title class_">ContractElement</span>[];              <span class="hljs-comment">// path → {type, unit, codeSystem, required}</span>
+  <span class="hljs-attr">authority</span>: <span class="hljs-title class_">AuthorityRef</span>;                  <span class="hljs-comment">// ★ 계약 자체의 외부 권위 (병원/제조사 승인)</span>
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ContractBinder</span> {
+  <span class="hljs-comment">// 순수 함수: L2 + 카탈로그를 읽어 contract 슬롯을 채운다. 네트워크 I/O 없음(카탈로그는 미리 로드됨).</span>
+  <span class="hljs-title function_">bind</span>(<span class="hljs-attr">l2</span>: L2Overlay[], <span class="hljs-attr">catalog</span>: <span class="hljs-title class_">ContractCatalog</span>): L2Overlay[];
+}
+</code></pre>
+<p><strong>scope→contract 승격 규칙(결정적):</strong></p>
+<ol>
+<li>Binder는 각 <code>Field</code>/<code>Display</code>의 <code>binding.path</code>를 카탈로그 <code>elements[].path</code>와 <strong>정규화 매칭</strong>(케이스/구분자 무시, 별칭 테이블 적용)한다.</li>
+<li>매칭 성공: <code>binding.scope = 'contract'</code>로 승격, <code>binding.contract = {schema, resource, element, status:'known', contractRef}</code>, 계약이 명시한 <code>unit</code>/<code>codeSystem</code>/<code>required</code>를 슬롯에 채우되 <strong>Promoter 관측값과 충돌하면 둘 다 보존</strong>(정합성 룰이 불일치를 위반으로 발화).</li>
+<li>매칭 실패(계약에 없는 path) 또는 카탈로그 부재: <code>binding.scope</code>는 <code>ui-internal</code> 유지, <code>binding.contract.status = 'unknown'</code>. <strong>fail-open 아님</strong> — 계약기반 정합성 룰은 <code>status:'unknown'</code>을 &quot;계약 미확인&quot;으로 별도 발화(차단 아닌 경고, P5와 일관).</li>
+<li>카탈로그 version은 <code>inputDigest</code> 산입 대상에 포함되어 카탈로그 변경이 재현성에 반영된다.</li>
+</ol>
+<p><strong>로드 소스:</strong> <code>contractCatalog</code>는 룰저장소(L5)와 같은 메커니즘으로 공급된다 — 1단계 Git manifest, 2단계 Postgres + 서명 번들. <strong>1단계에는 카탈로그가 비어 있고</strong>(<code>contracts:[]</code>) BIND는 전 노드를 <code>contract.status:'unknown'</code>으로 통과시킨다(계약기반 룰은 2단계에 활성). 슬롯·단계가 1일차에 존재하므로 무재작업.</p>
+<h3 id="3-7-교차-시나리오-finding-합성-dedup-검토-r2-1단계로-끌어옴" class="hd"><a class="anchor" href="#3-7-교차-시나리오-finding-합성-dedup-검토-r2-1단계로-끌어옴" aria-label="anchor">#</a>3.7 교차 시나리오 Finding 합성·dedup (검토 R2 — 1단계로 끌어옴)</h3>
+<blockquote>
+<p><strong>검토 교정:</strong> v1은 scenarios dedup을 2단계로 미뤘으나, scenarios[]가 1단계 기능이므로 <strong>미명세 시 1단계 리포트가 즉시 중복으로 오염</strong>된다. 확정본은 dedup 규약을 1일차 명세로 끌어온다.</p>
+</blockquote>
+<ul>
+<li><strong>dedup 키:</strong> <code>(ruleId, stableNodeKey)</code> — <code>stableNodeKey</code>는 §3.2.1의 시나리오 불변 <code>nodeId</code>. 같은 룰이 같은 구조 노드에서 여러 scenario에 발화하면 <strong>1 Finding으로 병합</strong>.</li>
+<li><strong>evidence 합성:</strong> 병합된 Finding의 <code>evidence.observed</code>는 시나리오별 관측을 배열로 보존(<code>perScenario: [{scenarioId, observed}]</code>). 리포트는 &quot;3개 상태 중 2개에서 발화&quot; 같은 커버리지를 표시.</li>
+<li><strong>유효심각도 합성:</strong> 병합 Finding의 effectiveSeverity는 <strong>시나리오별 effectiveSeverity의 최댓값(가장 강한 차단)</strong> 으로 정한다. 단 어떤 시나리오에서 노드 status가 <code>known</code>이고 다른 시나리오에서 <code>unknown</code>이면 known 관측을 우선한다(관측 우위).</li>
+<li><strong>시나리오 고유 위반:</strong> 특정 상태에서만 존재하는 노드의 위반(예: <code>validation-error</code>에서만 나타나는 잘못된 에러 카피)은 고유 <code>nodeId</code>이므로 병합되지 않고 단독 Finding으로 남는다 — <code>scenarioCoverage</code>가 출처를 명시.</li>
+<li><strong>결정성:</strong> dedup은 정렬된 <code>(ruleId, nodeId)</code> 순회로 수행 → 같은 입력에 같은 병합 결과(골든 스냅샷 안정).</li>
+</ul>
+<h3 id="3-8-구체-예시-처방-화면을-실제-ir로" class="hd"><a class="anchor" href="#3-8-구체-예시-처방-화면을-실제-ir로" aria-label="anchor">#</a>3.8 구체 예시 — 처방 화면을 실제 IR로</h3>
+<p><strong>입력(렌더된 처방 화면, 단순화)</strong>:</p>
+<pre class="hljs"><code><span class="hljs-tag">&lt;<span class="hljs-name">form</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">label</span> <span class="hljs-attr">for</span>=<span class="hljs-string">&quot;drug&quot;</span>&gt;</span>약품<span class="hljs-tag">&lt;/<span class="hljs-name">label</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;drug&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;order.drug&quot;</span> <span class="hljs-attr">required</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">option</span>&gt;</span>Amoxicillin<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;dose&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;order.dose&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;number&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;500&quot;</span>/&gt;</span>   <span class="hljs-comment">&lt;!-- 라벨 미연결, mg 미표기 --&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">style</span>=<span class="hljs-string">&quot;color:#bbb;background:#fff&quot;</span>&gt;</span>처방 저장<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>     <span class="hljs-comment">&lt;!-- 대비 1.6:1 --&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span>
+</code></pre>
+<p><strong>생성된 IR (scenario='empty' 기준, 1단계 — 카탈로그 비어 contract.status=unknown)</strong>:</p>
+<pre class="hljs"><code><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;irSchemaVersion&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;tenantId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hosp-A&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;runId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;run_2026-06-25_a1&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;inputDigest&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sha256:9f2c…&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;l1&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;rootId&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;l1:0a1b2c3d4e5f&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;nodes&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;l1:0a1b2c3d4e5f&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:0a1b2c3d4e5f&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;form&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;attributes&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;children&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l1:11aa…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-string">&quot;l1:22bb…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-string">&quot;l1:33cc…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;l1:11aa…&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:11aa…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;select&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;attributes&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;drug&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;order.drug&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;a11y&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;combobox&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;약품&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;children&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;select&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;l1:22bb…&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:22bb…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;input&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;attributes&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;dose&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;order.dose&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;number&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;500&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;computed&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;contrast&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">4.6</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;focusable&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;a11y&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;spinbutton&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>   <span class="hljs-comment">// 라벨 미연결: 측정됐고 빈값</span>
+              <span class="hljs-attr">&quot;children&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;input&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;l1:33cc…&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:33cc…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;tag&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;button&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;text&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;처방 저장&quot;</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;computed&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;contrast&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.6</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>   <span class="hljs-comment">// 저대비 — 측정값 존재</span>
+              <span class="hljs-attr">&quot;a11y&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;button&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;value&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;처방 저장&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measured&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;children&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.0</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+              <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;button&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;l2&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l2:f0…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Form&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;fields&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l2:d1…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-string">&quot;l2:d2…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;actions&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l2:s1…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.9</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l1:0a1b2c3d4e5f&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l2:d1…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Field&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;약품&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;dataType&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;code&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;binding&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;scope&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ui-internal&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;path&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;order.drug&quot;</span><span class="hljs-punctuation">,</span>
+                  <span class="hljs-attr">&quot;codeSystem&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;system&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;RxNorm&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+                  <span class="hljs-attr">&quot;contract&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;schema&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;FHIR&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;resource&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;element&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>  <span class="hljs-comment">// 1단계 카탈로그 비어 unknown</span>
+      <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.92</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l1:11aa…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;select&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l2:d2…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Field&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">,</span>   <span class="hljs-comment">// ← false 단정 안 함 (P6)</span>
+      <span class="hljs-attr">&quot;dataType&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;number&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;binding&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;scope&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ui-internal&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;path&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;order.dose&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;observedType&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;number&quot;</span><span class="hljs-punctuation">,</span>
+                  <span class="hljs-attr">&quot;unit&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;system&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;UCUM&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>                  <span class="hljs-comment">// 단위 슬롯 — mg? UI에 단위 없음 (제약 D)</span>
+                  <span class="hljs-attr">&quot;contract&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;schema&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;FHIR&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;resource&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;element&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;unknown&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.8</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;ambiguous&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l1:22bb…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;input&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;nodeId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l2:s1…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Action&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;submit&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;order&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;confidence&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.85</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;known&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;derivedFrom&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;l1:33cc…&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioCoverage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;provenance&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;source&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;domPath&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;body&gt;form&gt;button&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;captureId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;cap1&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span><span class="hljs-punctuation">}</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;l3&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>   <span class="hljs-comment">// 1단계: 의료 주석 없음. 스키마 슬롯만 존재 → 3단계 채워도 L1/L2/규칙/출력 불변</span>
+  <span class="hljs-attr">&quot;facts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;engine&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;axe-core@4.x&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;ruleId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;label&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;appliesTo&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:22bb…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;impact&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;critical&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measurable&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;observed&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;accessibleName&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;&quot;</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;engine&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;axe-core@4.x&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;ruleId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;color-contrast&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;appliesTo&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;l1:33cc…&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;impact&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;serious&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;measurable&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+      <span class="hljs-attr">&quot;observed&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;ratio&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1.6</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;required&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">4.5</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;scenarioId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;empty&quot;</span> <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p><strong>이 IR 하나로 4종 검사가 도는 방식</strong>:</p>
+<ul>
+<li>접근성: <code>l1:22bb….a11y.name.value=&quot;&quot;</code>(measured:true) + axe <code>label</code> fact → <strong>block</strong> (확정 사실, status known).</li>
+<li>접근성: <code>l1:33cc….computed.contrast.value=1.6 &lt; 4.5</code> → <strong>block</strong> (status known).</li>
+<li>일관성(2단계): <code>l2:s1….target=order</code>가 L2 binding에 존재함 확인.</li>
+<li>데이터정합성-폐쇄형(2단계): <code>l2:d2…</code>의 단위 슬롯 <code>status:unknown</code> → 경고(계약 없이는 미상).</li>
+<li>데이터정합성-계약기반(2~3단계): 카탈로그 활성 시 ContractBinder가 <code>l2:d2…</code>를 FHIR <code>MedicationRequest.dosage</code>에 결합 → 단위 필수인데 UI에 없음 → 위반.</li>
+<li>규제/안전(3단계): L3 채워지면 <code>l2:d2…</code>를 병원 처방 규격과 대조.</li>
+</ul>
+<p><strong>1단계 IR과 3단계 IR의 L1/L2 구조가 동일</strong> — L3 채움 + contract 슬롯 활성화만. 이것이 무재작업의 물리적 근거.</p>
+<hr>
+<h2 id="4-l3-규칙-엔진-플러그인-인터페이스-심각도-롤아웃" class="hd"><a class="anchor" href="#4-l3-규칙-엔진-플러그인-인터페이스-심각도-롤아웃" aria-label="anchor">#</a>4. L3 규칙 엔진 — 플러그인 인터페이스 + 심각도/롤아웃</h2>
+<h3 id="4-1-규칙-플러그인-인터페이스-시그니처" class="hd"><a class="anchor" href="#4-1-규칙-플러그인-인터페이스-시그니처" aria-label="anchor">#</a>4.1 규칙 플러그인 인터페이스 (시그니처)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">Rule</span> {
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span>;                    <span class="hljs-comment">// &quot;a11y.input-label&quot;</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;accessibility&#x27;</span> | <span class="hljs-string">&#x27;consistency&#x27;</span> | <span class="hljs-string">&#x27;data-integrity&#x27;</span> | <span class="hljs-string">&#x27;regulatory-safety&#x27;</span>;
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">version</span>: <span class="hljs-built_in">string</span>;               <span class="hljs-comment">// semver — 감사·롤아웃 단위</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">defaultSeverity</span>: <span class="hljs-title class_">Severity</span>;     <span class="hljs-comment">// &#x27;block&#x27; | &#x27;warn&#x27; | &#x27;info&#x27;</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">requires</span>: <span class="hljs-title class_">IRLayer</span>[];           <span class="hljs-comment">// [&#x27;l1&#x27;] | [&#x27;l2&#x27;,&#x27;facts&#x27;] | [&#x27;l2&#x27;,&#x27;l3&#x27;] → 미충족 시 자동 skip</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">confidenceFloor</span>: <span class="hljs-built_in">number</span>;       <span class="hljs-comment">// 이 미만 confidence면 block→warn 강등 (P5)</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">unknownPolicy</span>: <span class="hljs-title class_">UnknownPolicy</span>;  <span class="hljs-comment">// ★ status가 unknown/ambiguous일 때 동작 (검토 high-1)</span>
+  <span class="hljs-keyword">readonly</span> <span class="hljs-attr">authority</span>: <span class="hljs-title class_">AuthorityRef</span>;        <span class="hljs-comment">// ★ 필수 (optional 아님) — fail-closed (제약 E)</span>
+
+  <span class="hljs-comment">// 순수 함수: IR+facts 읽기만, I/O·네트워크·부수효과 금지 (P3)</span>
+  <span class="hljs-title function_">evaluate</span>(<span class="hljs-attr">ir</span>: <span class="hljs-title class_">Readonly</span>&lt;<span class="hljs-variable constant_">IR</span>&gt;, <span class="hljs-attr">ctx</span>: <span class="hljs-title class_">RuleContext</span>): <span class="hljs-title class_">Violation</span>[];
+}
+
+<span class="hljs-comment">// 검토 high-1 해소: 룰이 unknown/ambiguous 노드를 어떻게 다룰지 명시적 선언</span>
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">UnknownPolicy</span> =
+  | <span class="hljs-string">&#x27;skip&#x27;</span>        <span class="hljs-comment">// 미상 노드는 평가 제외 (예: required가 unknown인데 required 검사면 발화 안 함)</span>
+  | <span class="hljs-string">&#x27;demote&#x27;</span>      <span class="hljs-comment">// 발화하되 block→warn 강등 (불확실하나 알릴 가치)</span>
+  | <span class="hljs-string">&#x27;report&#x27;</span>;     <span class="hljs-comment">// status:unknown Finding으로 정보 보고 (info, 게이트 미반영)</span>
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">Severity</span> = <span class="hljs-string">&#x27;block&#x27;</span> | <span class="hljs-string">&#x27;warn&#x27;</span> | <span class="hljs-string">&#x27;info&#x27;</span>;
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">IRLayer</span> = <span class="hljs-string">&#x27;l1&#x27;</span> | <span class="hljs-string">&#x27;l2&#x27;</span> | <span class="hljs-string">&#x27;l3&#x27;</span> | <span class="hljs-string">&#x27;facts&#x27;</span>;
+
+<span class="hljs-comment">// 외부 권위 — 모든 Finding 동반 필수 (제약 E)</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">AuthorityRef</span> {
+  <span class="hljs-attr">ruleSource</span>: <span class="hljs-built_in">string</span>;        <span class="hljs-comment">// &quot;WCAG 2.2 AA&quot; | &quot;hospital-A-medication-spec&quot; | &quot;FHIR-R4&quot;</span>
+  <span class="hljs-attr">clause</span>?: <span class="hljs-built_in">string</span>;           <span class="hljs-comment">// &quot;1.4.3&quot; | &quot;MedicationRequest.dosage&quot;</span>
+  <span class="hljs-attr">version</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">approvedBy</span>?: <span class="hljs-built_in">string</span>;       <span class="hljs-comment">// 도메인 룰(L3)은 병원/제조사 승인자 강제</span>
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Violation</span> {
+  <span class="hljs-attr">ruleId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">ruleVersion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">severity</span>: <span class="hljs-title class_">Severity</span>;                      <span class="hljs-comment">// 엔진이 rollout/confidence/status로 effective 재계산</span>
+  <span class="hljs-attr">nodeId</span>: <span class="hljs-title class_">NodeId</span>;
+  <span class="hljs-attr">nodeStatus</span>: <span class="hljs-title class_">NodeStatus</span>;                  <span class="hljs-comment">// ★ 평가 대상 노드의 status (게이트로 전파 — P6)</span>
+  <span class="hljs-attr">message</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">provenance</span>: <span class="hljs-title class_">Provenance</span>;                  <span class="hljs-comment">// 수정위치 = IR 노드 provenance 전파</span>
+  <span class="hljs-attr">authority</span>: <span class="hljs-title class_">AuthorityRef</span>;                 <span class="hljs-comment">// ★ 없으면 스키마 검증 거부 (fail-closed)</span>
+  <span class="hljs-attr">evidence</span>: {                              <span class="hljs-comment">// A에서 접목 — 관측값 1급</span>
+    <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;fact&#x27;</span> | <span class="hljs-string">&#x27;computed&#x27;</span> | <span class="hljs-string">&#x27;structural&#x27;</span>;
+    <span class="hljs-attr">engine</span>?: <span class="hljs-built_in">string</span>;
+    <span class="hljs-attr">observed</span>: <span class="hljs-built_in">unknown</span>;                     <span class="hljs-comment">// 무엇을 보고 판정했나 (예: {ratio:1.6, required:4.5})</span>
+  };
+  <span class="hljs-attr">confidence</span>: <span class="hljs-built_in">number</span>;                      <span class="hljs-comment">// IR 노드 confidence 전파</span>
+  <span class="hljs-attr">fixHint</span>?: <span class="hljs-built_in">string</span>;
+}
+</code></pre>
+<h3 id="4-2-규칙이-ir-위에서-도는-방식-예시" class="hd"><a class="anchor" href="#4-2-규칙이-ir-위에서-도는-방식-예시" aria-label="anchor">#</a>4.2 규칙이 IR 위에서 도는 방식 (예시)</h3>
+<pre class="hljs"><code><span class="hljs-comment">// a11y.input-label — 1단계 5규칙 중 하나</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">inputLabel</span>: <span class="hljs-title class_">Rule</span> = {
+  <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;a11y.input-label&#x27;</span>, <span class="hljs-attr">category</span>: <span class="hljs-string">&#x27;accessibility&#x27;</span>, <span class="hljs-attr">version</span>: <span class="hljs-string">&#x27;1.2.0&#x27;</span>,
+  <span class="hljs-attr">defaultSeverity</span>: <span class="hljs-string">&#x27;block&#x27;</span>, <span class="hljs-attr">requires</span>: [<span class="hljs-string">&#x27;l2&#x27;</span>, <span class="hljs-string">&#x27;facts&#x27;</span>], <span class="hljs-attr">confidenceFloor</span>: <span class="hljs-number">0.9</span>,
+  <span class="hljs-attr">unknownPolicy</span>: <span class="hljs-string">&#x27;demote&#x27;</span>,
+  <span class="hljs-attr">authority</span>: { <span class="hljs-attr">ruleSource</span>: <span class="hljs-string">&#x27;WCAG 2.2 AA&#x27;</span>, <span class="hljs-attr">clause</span>: <span class="hljs-string">&#x27;4.1.2&#x27;</span>, <span class="hljs-attr">version</span>: <span class="hljs-string">&#x27;2.2&#x27;</span> },
+
+  <span class="hljs-title function_">evaluate</span>(<span class="hljs-params">ir</span>) {
+    <span class="hljs-keyword">return</span> ir.<span class="hljs-property">l2</span>
+      .<span class="hljs-title function_">filter</span>((n): n is <span class="hljs-title class_">Extract</span>&lt;L2Overlay,{<span class="hljs-attr">kind</span>:<span class="hljs-string">&#x27;Field&#x27;</span>}&gt; =&gt; n.<span class="hljs-property">kind</span> === <span class="hljs-string">&#x27;Field&#x27;</span>)
+      .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">label</span> === <span class="hljs-literal">null</span> &amp;&amp; <span class="hljs-title function_">hasFact</span>(ir.<span class="hljs-property">facts</span>, f.<span class="hljs-property">derivedFrom</span>[<span class="hljs-number">0</span>], <span class="hljs-string">&#x27;axe-core&#x27;</span>, <span class="hljs-string">&#x27;label&#x27;</span>))
+      .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> ({
+        <span class="hljs-attr">ruleId</span>: <span class="hljs-string">&#x27;a11y.input-label&#x27;</span>, <span class="hljs-attr">ruleVersion</span>: <span class="hljs-string">&#x27;1.2.0&#x27;</span>, <span class="hljs-attr">severity</span>: <span class="hljs-string">&#x27;block&#x27;</span>,
+        <span class="hljs-attr">nodeId</span>: f.<span class="hljs-property">nodeId</span>, <span class="hljs-attr">nodeStatus</span>: f.<span class="hljs-property">status</span>,
+        <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;입력 필드에 접근 가능한 레이블이 없습니다&#x27;</span>,
+        <span class="hljs-attr">provenance</span>: f.<span class="hljs-property">provenance</span>,
+        <span class="hljs-attr">authority</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">authority</span>,
+        <span class="hljs-attr">evidence</span>: { <span class="hljs-attr">kind</span>: <span class="hljs-string">&#x27;fact&#x27;</span>, <span class="hljs-attr">engine</span>: <span class="hljs-string">&#x27;axe-core&#x27;</span>, <span class="hljs-attr">observed</span>: { <span class="hljs-attr">accessibleName</span>: <span class="hljs-string">&#x27;&#x27;</span> } },
+        <span class="hljs-attr">confidence</span>: f.<span class="hljs-property">confidence</span>,
+        <span class="hljs-attr">fixHint</span>: <span class="hljs-string">&#x27;&lt;label&gt; 연결 또는 aria-label 추가&#x27;</span>,
+      }));
+  }
+};
+</code></pre>
+<p>규칙은 IR+facts만 읽는 <strong>순수 함수</strong>. <code>requires</code>에 <code>l3</code>을 선언한 규칙은 1단계에 L3가 없으므로 <strong>자동 skip</strong>(에러 아님) → 같은 엔진이 1·3단계 공존. 이것이 무재작업 진화의 메커니즘이자 룰 IP 서버화의 토대(P3).</p>
+<h3 id="4-3-누수-교정-미측정-vs-통과-구분-렌즈2-미해결난제-해소" class="hd"><a class="anchor" href="#4-3-누수-교정-미측정-vs-통과-구분-렌즈2-미해결난제-해소" aria-label="anchor">#</a>4.3 누수 교정: '미측정' vs '통과' 구분 (렌즈2 미해결난제 해소)</h3>
+<p>규칙은 <code>Measured&lt;T&gt;.measured</code>와 <code>ExternalFact.measurable</code>로 &quot;측정 불가(정적 경로)&quot;와 &quot;측정됐고 통과&quot;를 구분한다.</p>
+<pre class="hljs"><code><span class="hljs-comment">// a11y.color-contrast — 미측정을 위반으로 오판하지 않음</span>
+<span class="hljs-title function_">evaluate</span>(<span class="hljs-params">ir</span>) {
+  <span class="hljs-keyword">return</span> ir.<span class="hljs-title function_">l1nodes</span>()
+    .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> n.<span class="hljs-property">computed</span>?.<span class="hljs-property">contrast</span>?.<span class="hljs-property">measured</span> === <span class="hljs-literal">true</span>)         <span class="hljs-comment">// 측정된 것만 평가</span>
+    .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> n.<span class="hljs-property">computed</span>!.<span class="hljs-property">contrast</span>!.<span class="hljs-property">value</span>! &lt; <span class="hljs-number">4.5</span>)
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">n</span> =&gt;</span> <span class="hljs-title function_">violation</span>(...));
+  <span class="hljs-comment">// contrast.measured===false (정적 경로) → 평가 대상 제외, status:unknown으로 리포트에 별도 표기</span>
+}
+</code></pre>
+<h3 id="4-4-심각도-모델-두-겹-confidence-status-게이팅-검토-high-1-핵심" class="hd"><a class="anchor" href="#4-4-심각도-모델-두-겹-confidence-status-게이팅-검토-high-1-핵심" aria-label="anchor">#</a>4.4 심각도 모델 — 두 겹 × confidence × status 게이팅 (검토 high-1 핵심)</h3>
+<blockquote>
+<p><strong>검토가 지적한 결함:</strong> v1의 <code>effectiveSeverity</code>는 숫자 <code>confidence</code>만 봤다. 그래서 <code>status:'ambiguous'</code>이면서 <code>confidence</code>가 floor 이상인 노드는 차단 동작이 <strong>미정의</strong>였고, P6(unknown 1급)이 게이트까지 도달하지 못했다. 확정본은 <strong><code>status</code>를 effectiveSeverity의 1급 입력으로 추가</strong>하고, 룰별 <code>unknownPolicy</code>로 동작을 명시 선언하게 한다.</p>
+</blockquote>
+<pre class="hljs plain"><code>유효심각도(rule, binding, node) =
+  rollout강등(  status강등( confidence강등( rule.defaultSeverity ) )  )
+
+  ① confidence강등:  node.confidence &lt; rule.confidenceFloor  ⇒  block → warn
+  ② status강등:      node.status ∈ {unknown, ambiguous}      ⇒  rule.unknownPolicy 적용
+                       - 'skip'   : Finding 제거 (게이트·리포트 미반영)
+                       - 'demote' : block → warn (불확실하나 경고)
+                       - 'report' : severity → info, rolloutState 무관 게이트 미반영
+  ③ rollout강등:     binding.rolloutState=shadow ⇒ info ; =warn 이면 block → warn
+</code></pre>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">RuleBinding</span> {                   <span class="hljs-comment">// 룰셋 안 룰 1개 배치 상태 (tenant별)</span>
+  <span class="hljs-attr">ruleId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">ruleVersion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">rolloutState</span>: <span class="hljs-string">&#x27;shadow&#x27;</span> | <span class="hljs-string">&#x27;warn&#x27;</span> | <span class="hljs-string">&#x27;block&#x27;</span>;
+  <span class="hljs-attr">promotedBy</span>?: <span class="hljs-built_in">string</span>; <span class="hljs-attr">promotedAt</span>?: <span class="hljs-built_in">string</span>;   <span class="hljs-comment">// 승급 감사</span>
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">effectiveSeverity</span>(<span class="hljs-params"><span class="hljs-attr">v</span>: <span class="hljs-title class_">Violation</span>, <span class="hljs-attr">binding</span>: <span class="hljs-title class_">RuleBinding</span>, <span class="hljs-attr">rule</span>: <span class="hljs-title class_">Rule</span></span>): <span class="hljs-title class_">Severity</span> | <span class="hljs-literal">null</span> {
+  <span class="hljs-keyword">let</span> sev = v.<span class="hljs-property">severity</span>;
+
+  <span class="hljs-comment">// ① confidence-gating (P5)</span>
+  <span class="hljs-keyword">if</span> (sev === <span class="hljs-string">&#x27;block&#x27;</span> &amp;&amp; v.<span class="hljs-property">confidence</span> &lt; rule.<span class="hljs-property">confidenceFloor</span>) sev = <span class="hljs-string">&#x27;warn&#x27;</span>;
+
+  <span class="hljs-comment">// ② status-gating (P6 — 검토 high-1) — confidence가 floor 이상이어도 status가 미상이면 지배</span>
+  <span class="hljs-keyword">if</span> (v.<span class="hljs-property">nodeStatus</span> === <span class="hljs-string">&#x27;unknown&#x27;</span> || v.<span class="hljs-property">nodeStatus</span> === <span class="hljs-string">&#x27;ambiguous&#x27;</span>) {
+    <span class="hljs-keyword">if</span> (rule.<span class="hljs-property">unknownPolicy</span> === <span class="hljs-string">&#x27;skip&#x27;</span>)   <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;          <span class="hljs-comment">// Finding 제거</span>
+    <span class="hljs-keyword">if</span> (rule.<span class="hljs-property">unknownPolicy</span> === <span class="hljs-string">&#x27;report&#x27;</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;info&#x27;</span>;        <span class="hljs-comment">// 정보만, 게이트 미반영</span>
+    <span class="hljs-keyword">if</span> (rule.<span class="hljs-property">unknownPolicy</span> === <span class="hljs-string">&#x27;demote&#x27;</span> &amp;&amp; sev === <span class="hljs-string">&#x27;block&#x27;</span>) sev = <span class="hljs-string">&#x27;warn&#x27;</span>;
+  }
+
+  <span class="hljs-comment">// ③ rollout-gating (P9)</span>
+  <span class="hljs-keyword">if</span> (binding.<span class="hljs-property">rolloutState</span> === <span class="hljs-string">&#x27;shadow&#x27;</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;info&#x27;</span>;
+  <span class="hljs-keyword">if</span> (binding.<span class="hljs-property">rolloutState</span> === <span class="hljs-string">&#x27;warn&#x27;</span> &amp;&amp; sev === <span class="hljs-string">&#x27;block&#x27;</span>) sev = <span class="hljs-string">&#x27;warn&#x27;</span>;
+  <span class="hljs-keyword">return</span> sev;
+}
+</code></pre>
+<p><strong>불변식(게이트 차단 가능 조건):</strong> 어떤 Finding이 게이트를 <strong>차단</strong>하려면 반드시 <code>nodeStatus==='known'</code> <strong>이고</strong> <code>confidence ≥ confidenceFloor</code> <strong>이고</strong> <code>rolloutState==='block'</code>. 즉 미상·저신뢰·미승급 중 하나라도 있으면 절대 block에 도달하지 못한다. 이것이 &quot;추론으로 배포를 막지 않는다&quot;(P5)와 &quot;unknown≠null이 게이트까지 산다&quot;(P6)의 <strong>단일 강제 지점</strong>이다.</p>
+<h3 id="4-5-staged-rollout-break-glass-제약-h" class="hd"><a class="anchor" href="#4-5-staged-rollout-break-glass-제약-h" aria-label="anchor">#</a>4.5 Staged Rollout + Break-glass (제약 H)</h3>
+<ul>
+<li><strong>Staged rollout</strong>: 신규 룰은 항상 <code>shadow</code>(데이터만 수집) → <code>warn</code> → <code>block</code>. 코드 변경 없이 룰셋 상태 전환만으로. 위양성률을 보고 승급.</li>
+<li><strong>confidence/status-gating</strong>: L1 관측사실(1.0/known)만 강하게 차단. L2/L3 추론·미상은 floor 미만 또는 unknown이면 경고/제거로 강등 → 오탐 신뢰붕괴와 SaMD 오인 동시 방지 (제약 E).</li>
+<li><strong>Break-glass</strong>: <code>block</code> 위반이라도 권한자가 사유+서명으로 우회 → 게이트는 <code>block-overridden</code>(통과)이지만 감사에 우회자·사유·타임스탬프가 1급. <strong>최종 차단권은 병원 거버넌스</strong>(<code>tenantPolicy</code>가 소유).</li>
+</ul>
+<h4 id="4-5-1-break-glass-인가-모델-검토-thin-해소" class="hd"><a class="anchor" href="#4-5-1-break-glass-인가-모델-검토-thin-해소" aria-label="anchor">#</a>4.5.1 Break-glass 인가 모델 (검토 thin 해소)</h4>
+<p>break-glass는 <strong>인가된 주체만</strong> 수행 가능해야 무력화되지 않는다.</p>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">BreakGlassGrant</span> {
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;
+  <span class="hljs-attr">subject</span>: <span class="hljs-built_in">string</span>;                          <span class="hljs-comment">// 우회 주체 (계정/서비스)</span>
+  <span class="hljs-attr">role</span>: <span class="hljs-string">&#x27;governance-officer&#x27;</span> | <span class="hljs-string">&#x27;release-manager&#x27;</span>;   <span class="hljs-comment">// tenantPolicy가 인가한 역할만</span>
+  <span class="hljs-attr">scope</span>: { <span class="hljs-attr">ruleIds</span>?: <span class="hljs-built_in">string</span>[]; <span class="hljs-attr">categories</span>?: <span class="hljs-title class_">Rule</span>[<span class="hljs-string">&#x27;category&#x27;</span>][] };  <span class="hljs-comment">// 우회 가능 범위 제한</span>
+  <span class="hljs-attr">expiresAt</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">signature</span>: <span class="hljs-built_in">string</span>;                        <span class="hljs-comment">// tenant 거버넌스 키 서명 — 위조 방지</span>
+}
+</code></pre>
+<ul>
+<li>게이트는 break-glass 요청 시 <code>BreakGlassGrant</code> 서명을 tenant 거버넌스 공개키로 검증한다. 검증 실패 시 우회 <strong>거부</strong>(차단 유지).</li>
+<li>규제/안전(<code>regulatory-safety</code>) 카테고리 룰은 <code>tenantPolicy</code>가 명시 허용하지 않으면 break-glass 불가(기본 금지) — SaMD 사정권에서 안전 위반을 무단 우회하는 경로 차단.</li>
+<li>모든 우회 시도(성공·실패)는 감사 레코드에 1급 기록.</li>
+</ul>
+<h3 id="4-6-4종-검사의-처리-위치" class="hd"><a class="anchor" href="#4-6-4종-검사의-처리-위치" aria-label="anchor">#</a>4.6 4종 검사의 처리 위치</h3>
+<table>
+<thead>
+<tr>
+<th>검사</th>
+<th>읽는 레이어</th>
+<th>처리 근거</th>
+<th>단계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>접근성</strong></td>
+<td>L1(computed·a11y) + facts</td>
+<td>런타임 DOM 계산값 + axe-core 정규화</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>일관성</strong></td>
+<td>L2(폼 내부)</td>
+<td>없는 필드 참조·중복 라벨·intent 충돌·submit 다중</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>데이터정합성-폐쇄형</strong></td>
+<td>L2 binding(scope=ui-internal)</td>
+<td>UI 내부 타입/참조 — 외부 스키마 불필요 (제약 D)</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>데이터정합성-계약기반</strong></td>
+<td>L2 binding(scope=contract) + ContractBinder 결과</td>
+<td>FHIR/OpenAPI 대조, UCUM 단위·LOINC/RxNorm 코드 (제약 D)</td>
+<td>2~3</td>
+</tr>
+<tr>
+<td><strong>규제/안전</strong></td>
+<td>L2+L3(도메인 주석)</td>
+<td><code>authority</code> 필수, 의학판정 금지 — &quot;승인 규격 충족 여부&quot;만 (제약 E)</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-7-미측정-노드의-게이트-처리-검토-thin-해소" class="hd"><a class="anchor" href="#4-7-미측정-노드의-게이트-처리-검토-thin-해소" aria-label="anchor">#</a>4.7 미측정 노드의 게이트 처리 (검토 thin 해소)</h3>
+<p><code>Measured&lt;T&gt;.measured===false</code>(정적 경로 측정 불가) 또는 <code>ExternalFact.measurable===false</code>인 노드에 대해:</p>
+<ul>
+<li>측정 의존 룰(대비·포커스 등)은 해당 노드를 <strong>평가 대상에서 제외</strong>하고, 별도 <code>coverage-gap</code> 정보 Finding(<code>info</code>)을 생성해 &quot;이 노드는 현재 입력 경로로 검사 불가&quot;를 명시한다. <strong>미측정을 통과로도, 위반으로도 처리하지 않는다.</strong></li>
+<li>게이트는 <code>coverage-gap</code>을 차단에 산입하지 않으나, 리포트 <code>summary.coverageGaps</code>로 노출하여 정적 경로의 부분맹을 운영자가 인지하게 한다(런타임 경로 권장 신호).</li>
+</ul>
+<h3 id="4-8-1단계-접근성-5규칙" class="hd"><a class="anchor" href="#4-8-1단계-접근성-5규칙" aria-label="anchor">#</a>4.8 1단계 접근성 5규칙</h3>
+<p><code>a11y.input-label</code>(레이블 부재), <code>a11y.color-contrast</code>(대비&lt;요구치), <code>a11y.focus-order</code>(focusOrder vs DOM 순서 역전), <code>a11y.button-name</code>(액션 accessible name 부재), <code>a11y.required-indicator</code>(required=true인데 시각/ARIA 표시 없음). 전부 L1 관측(status known) 기반이라 1단계부터 강하게 차단 가능.</p>
+<hr>
+<h2 id="5-l4-리포트-게이트" class="hd"><a class="anchor" href="#5-l4-리포트-게이트" aria-label="anchor">#</a>5. L4 리포트 + 게이트</h2>
+<h3 id="5-1-리포트-스키마-머신리더블-개발자-뷰는-이것의-렌더링" class="hd"><a class="anchor" href="#5-1-리포트-스키마-머신리더블-개발자-뷰는-이것의-렌더링" aria-label="anchor">#</a>5.1 리포트 스키마 (머신리더블, 개발자 뷰는 이것의 렌더링)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">ValidationReport</span> {
+  <span class="hljs-attr">schemaVersion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">runId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>;
+  <span class="hljs-attr">ci</span>: { <span class="hljs-attr">repo</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">commit</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">pr</span>?: <span class="hljs-built_in">number</span> };
+  <span class="hljs-attr">inputDigest</span>: <span class="hljs-built_in">string</span>;                    <span class="hljs-comment">// 재현성 — 같은 입력 식별 (P7)</span>
+  <span class="hljs-attr">ruleSetVersion</span>: <span class="hljs-built_in">string</span>;                 <span class="hljs-comment">// version pin (P7)</span>
+  <span class="hljs-attr">contractCatalogVersion</span>?: <span class="hljs-built_in">string</span>;        <span class="hljs-comment">// 계약기반 정합성 재현성</span>
+  <span class="hljs-attr">irSchemaVersion</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">gate</span>: <span class="hljs-title class_">GateDecision</span>;
+  <span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportedFinding</span>[];
+  <span class="hljs-attr">summary</span>: {
+    <span class="hljs-attr">block</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">warn</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">info</span>: <span class="hljs-built_in">number</span>;
+    <span class="hljs-attr">unknownNodes</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">coverageGaps</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">scenarios</span>: <span class="hljs-built_in">string</span>[];
+  };
+  <span class="hljs-attr">audit</span>: { <span class="hljs-attr">auditRef</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">prevHash</span>: <span class="hljs-built_in">string</span> };   <span class="hljs-comment">// 불변 감사 레코드 포인터 + 체인 링크</span>
+  <span class="hljs-attr">generatedAt</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ReportedFinding</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Violation</span> {
+  <span class="hljs-attr">effectiveSeverity</span>: <span class="hljs-title class_">Severity</span>;            <span class="hljs-comment">// rollout × confidence × status 적용 후</span>
+  <span class="hljs-attr">rolloutState</span>: <span class="hljs-string">&#x27;shadow&#x27;</span> | <span class="hljs-string">&#x27;warn&#x27;</span> | <span class="hljs-string">&#x27;block&#x27;</span>;
+  <span class="hljs-attr">falsePositiveLabel</span>?: <span class="hljs-string">&#x27;confirmed-fp&#x27;</span> | <span class="hljs-string">&#x27;confirmed-tp&#x27;</span> | <span class="hljs-string">&#x27;unreviewed&#x27;</span>;  <span class="hljs-comment">// 위양성 라벨링 (검토 thin)</span>
+  <span class="hljs-attr">location</span>: { <span class="hljs-attr">domPath</span>?: <span class="hljs-built_in">string</span>; <span class="hljs-attr">source</span>?: { <span class="hljs-attr">file</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">line</span>: <span class="hljs-built_in">number</span>; <span class="hljs-attr">col</span>: <span class="hljs-built_in">number</span> } };  <span class="hljs-comment">// 수정위치</span>
+  <span class="hljs-attr">perScenario</span>?: { <span class="hljs-attr">scenarioId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">observed</span>: <span class="hljs-built_in">unknown</span> }[];   <span class="hljs-comment">// §3.7 dedup 합성</span>
+  <span class="hljs-attr">overridden</span>?: { <span class="hljs-attr">by</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">reason</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">at</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">grantId</span>: <span class="hljs-built_in">string</span> };   <span class="hljs-comment">// break-glass</span>
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">GateDecision</span> {
+  <span class="hljs-attr">result</span>: <span class="hljs-string">&#x27;pass&#x27;</span> | <span class="hljs-string">&#x27;block&#x27;</span> | <span class="hljs-string">&#x27;block-overridden&#x27;</span>;
+  <span class="hljs-attr">blocking</span>: <span class="hljs-built_in">string</span>[];                     <span class="hljs-comment">// 차단 룰 ID들</span>
+  <span class="hljs-attr">policy</span>: { <span class="hljs-attr">tenantPolicyVersion</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">blockOn</span>: <span class="hljs-built_in">string</span> };   <span class="hljs-comment">// 차단 정책은 tenant 소유 (제약 E·H)</span>
+  <span class="hljs-attr">breakGlass</span>?: { <span class="hljs-attr">by</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">reason</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">at</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">grantId</span>: <span class="hljs-built_in">string</span> };
+}
+</code></pre>
+<p><strong>위반·근거·수정위치 3종 세트가 모든 Finding에 보장</strong>: 근거=<code>evidence</code>(관측값)+<code>authority</code>(외부 출처·버전·승인자), 수정위치=<code>location</code>(provenance 역추적한 원본 file:line:col 또는 domPath).</p>
+<p><strong>위양성 라벨링(검토 thin 해소):</strong> 운영자가 Finding을 <code>confirmed-fp</code>로 라벨하면 감사에 기록되고, 룰별 위양성률 메트릭(§7.3)에 집계되어 staged rollout 승급/강등의 입력이 된다. 라벨은 게이트 결과를 바꾸지 않으며(우회는 break-glass 전용), 룰 품질 피드백 루프에만 쓰인다.</p>
+<h3 id="5-2-게이트-결정-로직-exit-code-계약-검토-thin-해소-1일차-고정" class="hd"><a class="anchor" href="#5-2-게이트-결정-로직-exit-code-계약-검토-thin-해소-1일차-고정" aria-label="anchor">#</a>5.2 게이트 결정 로직 + Exit Code 계약 (검토 thin 해소 — 1일차 고정)</h3>
+<pre class="hljs"><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">decideGate</span>(<span class="hljs-params"><span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportedFinding</span>[], <span class="hljs-attr">policy</span>: <span class="hljs-title class_">TenantGatePolicy</span></span>): <span class="hljs-title class_">GateDecision</span> {
+  <span class="hljs-keyword">const</span> blocking = findings.<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span>
+    f.<span class="hljs-property">effectiveSeverity</span> === <span class="hljs-string">&#x27;block&#x27;</span> &amp;&amp; f.<span class="hljs-property">rolloutState</span> === <span class="hljs-string">&#x27;block&#x27;</span> &amp;&amp; !f.<span class="hljs-property">overridden</span>);
+
+  <span class="hljs-keyword">if</span> (blocking.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) {
+    <span class="hljs-keyword">const</span> wasOverridden = findings.<span class="hljs-title function_">some</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span>
+      f.<span class="hljs-property">effectiveSeverity</span> === <span class="hljs-string">&#x27;block&#x27;</span> &amp;&amp; f.<span class="hljs-property">rolloutState</span> === <span class="hljs-string">&#x27;block&#x27;</span> &amp;&amp; f.<span class="hljs-property">overridden</span>);
+    <span class="hljs-keyword">return</span> { <span class="hljs-attr">result</span>: wasOverridden ? <span class="hljs-string">&#x27;block-overridden&#x27;</span> : <span class="hljs-string">&#x27;pass&#x27;</span>, <span class="hljs-attr">blocking</span>: [], policy };
+  }
+  <span class="hljs-keyword">return</span> { <span class="hljs-attr">result</span>: <span class="hljs-string">&#x27;block&#x27;</span>, <span class="hljs-attr">blocking</span>: blocking.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">f</span> =&gt;</span> f.<span class="hljs-property">ruleId</span>), policy };
+}
+</code></pre>
+<p><strong>Exit Code 계약 (1일차 동결, 단계 무관 고정):</strong></p>
+<table>
+<thead>
+<tr>
+<th>code</th>
+<th>의미</th>
+<th>발생 조건</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0</strong></td>
+<td>pass / 통과</td>
+<td><code>gate.result ∈ {pass, block-overridden}</code> (정상 통과 또는 인가된 우회)</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td>block / 차단</td>
+<td><code>gate.result==='block'</code> (실제 위반으로 게이트 차단)</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>tool-error / 도구오류</td>
+<td>마운트 실패·빌드 깨짐·미지원 입력·타임아웃(<code>CaptureResult.ok===false</code>)·스키마 검증 실패(authority 부재)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>freeze 의미:</strong> 코드 0/1/2의 의미는 <strong>1단계부터 동결</strong>한다. 1단계는 리포트가 목표라 게이트를 비활성(<code>--no-gate</code>)으로 돌려도 <strong>exit code 매핑 자체는 동일</strong>하게 유지 — 2단계 게이트 전환 시 CI 워크플로 재작성이 불필요. code 2(도구오류)와 code 1(위반)을 구분하지 않으면 CI가 &quot;도구 깨짐&quot;을 &quot;코드 위반&quot;으로 오인하므로, 이 구분은 day-1 필수다.</li>
+<li>code 2는 <strong>항상 비차단 실패로 취급할지(soft)·차단으로 취급할지(hard)</strong> 를 <code>tenantPolicy.toolErrorMode</code>가 결정한다(기본 soft: 도구 오류로 배포를 막지 않되 리포트에 경고).</li>
+</ul>
+<h3 id="5-3-ci-통합" class="hd"><a class="anchor" href="#5-3-ci-통합" aria-label="anchor">#</a>5.3 CI 통합</h3>
+<ul>
+<li><strong>1단계</strong>: CLI (<code>softbowl verify --input &lt;url|bundle&gt; --tenant hosp-A --ruleset @pinned --out report.json</code>). 리포트 + HTML 출력. 게이트는 <code>--no-gate</code> 기본이나 exit code 매핑은 §5.2대로 유지.</li>
+<li><strong>2단계</strong>: 동일 CLI가 게이트 활성 → GitHub Actions/GitLab CI/Jenkins 한 스텝. <strong>SARIF</strong> 출력 추가 → PR 인라인 표시(위반이 소스 라인에 직접). CLI는 얇은 클라이언트, 룰 평가는 서버 API 호출(제약 F). 포맷터만 추가 → 재작업 없음.</li>
+</ul>
+<hr>
+<h2 id="6-l5-룰-저장소-ip-보호" class="hd"><a class="anchor" href="#6-l5-룰-저장소-ip-보호" aria-label="anchor">#</a>6. L5 룰 저장소 + IP 보호</h2>
+<h3 id="6-1-데이터-모델" class="hd"><a class="anchor" href="#6-1-데이터-모델" aria-label="anchor">#</a>6.1 데이터 모델</h3>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">RuleArtifact</span> {
+  <span class="hljs-attr">ruleId</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">version</span>: <span class="hljs-built_in">string</span>;        <span class="hljs-comment">// semver</span>
+  <span class="hljs-attr">category</span>: <span class="hljs-title class_">Rule</span>[<span class="hljs-string">&#x27;category&#x27;</span>];
+  <span class="hljs-attr">authority</span>: <span class="hljs-title class_">AuthorityRef</span>;                <span class="hljs-comment">// 외부 권위 (제약 E)</span>
+  <span class="hljs-attr">approval</span>: { <span class="hljs-attr">approver</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">org</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">role</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">approvedAt</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">signature</span>: <span class="hljs-built_in">string</span> };
+  <span class="hljs-attr">evalLocation</span>: <span class="hljs-string">&#x27;oss-local&#x27;</span> | <span class="hljs-string">&#x27;server-only&#x27;</span>;   <span class="hljs-comment">// IP 보호 분류 (제약 F)</span>
+  <span class="hljs-attr">evalRef</span>: <span class="hljs-title class_">ServerEvalRef</span>;                  <span class="hljs-comment">// B에서 접목 — 평가 위치 추상화 (인터페이스 불변)</span>
+}
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">RuleSet</span> {
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>; <span class="hljs-attr">version</span>: <span class="hljs-built_in">string</span>;     <span class="hljs-comment">// version pin 가능</span>
+  <span class="hljs-attr">bindings</span>: <span class="hljs-title class_">RuleBinding</span>[];
+  <span class="hljs-attr">composedFrom</span>: { <span class="hljs-attr">global</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">tenantOverride</span>?: <span class="hljs-built_in">string</span> };   <span class="hljs-comment">// 합성 출처 (§6.4)</span>
+}
+</code></pre>
+<h3 id="6-2-버전관리-승인-감사-제약-e" class="hd"><a class="anchor" href="#6-2-버전관리-승인-감사-제약-e" aria-label="anchor">#</a>6.2 버전관리·승인·감사 (제약 E)</h3>
+<table>
+<thead>
+<tr>
+<th>관심사</th>
+<th>1단계</th>
+<th>진화</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>저장</td>
+<td>룰 = repo 코드 + manifest. Git이 버전관리·승인(PR review)</td>
+<td>2단계: Postgres로 메타데이터, 코드는 서명 번들</td>
+</tr>
+<tr>
+<td>버전</td>
+<td>semver per rule. Finding이 <code>ruleVersion</code> 영구 박음</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>승인</td>
+<td>PR 머지 = 승인. <code>approvedBy</code> manifest 기록. 도메인 룰은 병원 승인자 강제</td>
+<td>거버넌스 UI에서 tenant별 승인/rollout 전이</td>
+</tr>
+<tr>
+<td>감사</td>
+<td>모든 Run을 불변 JSON append-only 레코드: inputDigest, IR해시, 룰버전집합, Findings, 게이트결정, break-glass</td>
+<td><strong>append-only 해시체인</strong> + WORM object storage</td>
+</tr>
+</tbody>
+</table>
+<h4 id="6-2-1-prevhash-체인-1단계-동작-정의-검토-thin-해소" class="hd"><a class="anchor" href="#6-2-1-prevhash-체인-1단계-동작-정의-검토-thin-해소" aria-label="anchor">#</a>6.2.1 prevHash 체인 — 1단계 동작 정의 (검토 thin 해소)</h4>
+<p>v1은 &quot;스키마는 1일차, 구현은 2단계&quot;라고만 했다. 확정본은 <strong>1단계에서 prevHash가 실제로 무엇을 담는지</strong> 고정한다.</p>
+<pre class="hljs"><code><span class="hljs-keyword">interface</span> <span class="hljs-title class_">AuditRecord</span> {
+  <span class="hljs-attr">auditRef</span>: <span class="hljs-built_in">string</span>;                         <span class="hljs-comment">// 이 레코드 id</span>
+  <span class="hljs-attr">tenantId</span>: <span class="hljs-title class_">TenantId</span>; <span class="hljs-attr">runId</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">recordHash</span>: <span class="hljs-built_in">string</span>;                       <span class="hljs-comment">// sha256(canonicalJSON(this 제외 prevHash 포함))</span>
+  <span class="hljs-attr">prevHash</span>: <span class="hljs-built_in">string</span>;                         <span class="hljs-comment">// 직전 (tenant별) 레코드의 recordHash, 최초는 &quot;GENESIS&quot;</span>
+  <span class="hljs-attr">inputDigest</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">irHash</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">ruleSetVersion</span>: <span class="hljs-built_in">string</span>; <span class="hljs-attr">contractCatalogVersion</span>?: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">findings</span>: <span class="hljs-title class_">ReportedFinding</span>[]; <span class="hljs-attr">gate</span>: <span class="hljs-title class_">GateDecision</span>;
+  <span class="hljs-attr">breakGlass</span>?: <span class="hljs-title class_">BreakGlassGrant</span>[<span class="hljs-string">&#x27;signature&#x27;</span>];
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-built_in">string</span>;
+}
+</code></pre>
+<ul>
+<li><strong>1단계 동작:</strong> 감사 레코드는 <strong>tenant별 append-only 파일</strong>에 기록되며 <code>prevHash</code>는 해당 tenant 직전 레코드의 <code>recordHash</code>를 실제로 담는다(체인이 1단계부터 <em>형성</em>됨, 빈 필드 아님). <code>recordHash</code> 계산은 1일차부터 수행한다. 차이는 <strong>검증 강제와 저장 매체</strong>뿐 — 1단계는 로컬/Git 파일에 신뢰 기반 저장, 사후 검증 스크립트 제공.</li>
+<li><strong>2단계 활성:</strong> WORM object storage 이전 + 체인 무결성 자동 검증(파이프라인이 <code>prevHash</code> 일치를 확인, 불일치 시 변조 경보) + 서명 키 관리(HSM 여부는 R8에서 확정).</li>
+<li>체인 시드(&quot;GENESIS&quot;)와 정규화(canonicalJSON: 키 정렬·공백 제거) 규약을 1일차 고정 → 1·2단계 해시 호환.</li>
+</ul>
+<h3 id="6-3-룰-ip-서버측-보호-제약-f-oss-도메인-하이브리드" class="hd"><a class="anchor" href="#6-3-룰-ip-서버측-보호-제약-f-oss-도메인-하이브리드" aria-label="anchor">#</a>6.3 룰 IP 서버측 보호 (제약 F) — OSS/도메인 하이브리드</h3>
+<p>규칙이 <strong>순수 함수(IR→Violation)</strong> 인 점(P3)이 보호를 공짜로 만든다.</p>
+<table>
+<thead>
+<tr>
+<th>룰 종류</th>
+<th>실행 위치</th>
+<th>보호</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OSS 룰 (axe-core 등, 1단계 접근성)</td>
+<td>로컬/서버 양쪽 허용</td>
+<td>IP 아님 — 1단계 데모 단순성·가벼움 확보</td>
+</tr>
+<tr>
+<td>소프트보울 도메인 룰 (L3 해자, 3단계)</td>
+<td><strong>서버측 전용</strong></td>
+<td>CLI는 IR 직렬화본만 업로드, 서버가 평가, Violation만 회신. 룰 본문 클라이언트 미노출</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>1단계는 안 짓는다(CLI 로컬 OSS 실행). 규칙이 I/O 없는 순수 함수로 <em>강제</em>돼 있으니 2단계에 <code>evalLocation:'server-only'</code> 룰은 프로세스 경계만 그으면 그대로 서버 이전 — <strong>인터페이스 변경 0</strong> (P1).</li>
+<li>민감 IR 외부 반출을 꺼리는 병원용 <strong>온프레미스 평가 노드</strong>(룰 서명·암호화 번들, 메모리 내 복호화)를 같은 인터페이스로 제공.</li>
+<li><strong>PHI 유출 경계(검토 thin 해소):</strong> IR을 서버로 업로드하기 전 CLI가 <strong>PHI 레닥션 패스</strong>를 적용한다 — <code>L1Node.text</code>·<code>attributes.value</code>·<code>a11y.name.value</code> 등 <em>값</em> 필드를 <code>[REDACTED]</code>로 치환하고 구조·타입·measured 플래그만 보존한다(규칙은 구조·관측 메타로 평가하므로 값 본문 불요). 레닥션은 <code>binding.path</code>·<code>nodeId</code>·<code>provenance</code> 같은 구조 키는 남긴다. 온프레미스 평가 노드는 레닥션 없이 내부망에서 평가하는 대안 경로. 레닥션 정책은 <code>tenantPolicy.phiRedaction</code>으로 tenant가 강도 선택.</li>
+</ul>
+<h3 id="6-4-tenant-룰셋-합성-검토-medium-해소-1단계-정의" class="hd"><a class="anchor" href="#6-4-tenant-룰셋-합성-검토-medium-해소-1단계-정의" aria-label="anchor">#</a>6.4 tenant 룰셋 합성 (검토 medium 해소 — 1단계 정의)</h3>
+<ul>
+<li>활성 룰셋 = <code>softbowl-global</code> <strong>베이스</strong> + <code>tenant-override</code> <strong>오버레이</strong>의 결정적 합성.</li>
+<li><strong>합성 규칙:</strong> 같은 <code>ruleId</code>에 대해 tenant-override의 <code>RuleBinding</code>(rolloutState·promotedBy)이 global을 덮어쓴다. tenant에만 있는 룰은 추가, global에만 있는 룰은 유지. 충돌 해소는 항상 <strong>tenant 우선</strong>.</li>
+<li><strong>1단계:</strong> 단일 tenant라 override가 비어 있어 합성 = global. 그러나 <code>composedFrom</code> 필드와 합성 함수는 1일차에 존재 → 멀티테넌트 전환 시 무재작업.</li>
+<li>3단계 멀티테넌트 거버넌스(override 승인 워크플로·우선순위 충돌 정책)는 R9에서 확정.</li>
+</ul>
+<hr>
+<h2 id="7-횡단-관심사" class="hd"><a class="anchor" href="#7-횡단-관심사" aria-label="anchor">#</a>7. 횡단 관심사</h2>
+<h3 id="7-1-책임-경계-samd-회피-제약-e-구조로-강제" class="hd"><a class="anchor" href="#7-1-책임-경계-samd-회피-제약-e-구조로-강제" aria-label="anchor">#</a>7.1 책임 경계 / SaMD 회피 (제약 E) — 구조로 강제</h3>
+<ul>
+<li><strong>전역 fail-closed 불변식</strong>: 모든 <code>Violation</code>은 <code>authority</code>(외부 권위 인용) 없이 스키마 검증에서 거부된다. authority는 optional이 아닌 <strong>필수 필드</strong>. 시스템은 &quot;우리가 판단했다&quot;가 아니라 &quot;규격 X 조항 Y와 불일치&quot;만 출력한다.</li>
+<li><strong>status+confidence-gating</strong>: 불확실한 추론(L2/L3)·미상(unknown/ambiguous)으로 배포를 막지 않음 → &quot;확신 없이 판정하는 자=SaMD 오인&quot; 회피 (P5·P6, §4.4 단일 강제 지점).</li>
+<li><strong>차단권 위임</strong>: 게이트 차단 정책은 <code>tenantPolicy</code>(병원)가 소유. 소프트보울은 정책을 <em>집행</em>만. 규제/안전 룰 break-glass는 tenant 명시 허용 없이 불가(§4.5.1). 포지셔닝 = &quot;거버넌스·규약 준수 집행자&quot;(CDSS/SaMD 아님).</li>
+<li><strong>감사 1급</strong>: <code>Finding.evidence</code>+<code>authority</code>, break-glass 우회(인가 서명 포함), prevHash 체인이 스키마상 필수.</li>
+</ul>
+<h3 id="7-2-멀티테넌시-벤더-독립-제약-g" class="hd"><a class="anchor" href="#7-2-멀티테넌시-벤더-독립-제약-g" aria-label="anchor">#</a>7.2 멀티테넌시 · 벤더 독립 (제약 G)</h3>
+<ul>
+<li><code>tenantId</code>가 <strong>IR 루트 필드로 타입 강제</strong>(P8) — RunContext뿐 아니라 IR·Capture·룰셋·게이트결정·감사·<strong>nodeId 시드</strong>의 1급 키. 런타임 규약이 아니라 컴파일타임 격리.</li>
+<li>룰셋은 <code>softbowl-global</code> + <code>tenant-override</code> 합성(§6.4). tenant별 rollout·게이트 정책·계약카탈로그·PHI 레닥션 강도 독립.</li>
+<li>어댑터는 표준 타깃(<strong>FHIR Questionnaire</strong>, 표준 React DOM)으로 일반화 — 특정 벤더(카카오) 전용 가정 없음. 단일 파트너 이탈해도 작동.</li>
+<li><strong>격리 구현은 2단계, 키는 1일차</strong>: 1단계는 단일 tenant 사용이나 <code>tenantId</code>가 골격에 박혀 나중 리팩토링 지옥 회피.</li>
+</ul>
+<h3 id="7-3-관측성" class="hd"><a class="anchor" href="#7-3-관측성" aria-label="anchor">#</a>7.3 관측성</h3>
+<ul>
+<li>구조화 로그(runId/traceId 상관). 메트릭: 룰별 발화율·<strong>위양성률</strong>(<code>falsePositiveLabel</code> 집계, 승급 입력), 어댑터 detect 신뢰도 분포, <code>unknown</code>/<code>ambiguous</code> 노드 비율·<code>coverageGaps</code> 수(IR 품질), 게이트 차단율·break-glass 빈도(거버넌스 건강성), scenario별 발화 차이.</li>
+<li><strong>감사 ≠ 관측성 분리</strong>: 감사=법적 불변 기록(prevHash 체인), 관측성=운영 텔레메트리.</li>
+<li><strong>결정성 회귀 테스트</strong>: 골든 IR 스냅샷(nodeId·dedup 결과 포함) — 같은 입력→같은 IR→같은 Finding 집합 보증.</li>
+</ul>
+<h3 id="7-4-성능-예산-에러-처리-검토-thin-해소" class="hd"><a class="anchor" href="#7-4-성능-예산-에러-처리-검토-thin-해소" aria-label="anchor">#</a>7.4 성능 예산 &amp; 에러 처리 (검토 thin 해소)</h3>
+<ul>
+<li><strong>성능 예산:</strong> 1단계 Run은 단일 화면·복수 scenario를 <strong>동기 수초~수십초</strong>로 처리(Playwright 콜드 마운트 ~2–5s/scenario + axe ~수백ms + 룰 평가 &lt;100ms). 목표 p95 &lt; 30s/Run(3 scenario). scenarios·페이지 수가 늘면 2단계에 워커 풀로 병렬화(인터페이스 불변, Run은 멱등). 마운트는 scenario 간 브라우저 컨텍스트 재사용으로 콜드스타트 분할.</li>
+<li><strong>에러 처리 분류:</strong> (a) 입력 결함(빌드 깨짐·미지원) → <code>CaptureResult{ok:false}</code> → exit 2. (b) 부분 캡처(일부 scenario만 성공) → 성공 scenario로 평가 진행 + <code>coverage-gap</code> 표기, exit은 게이트 결과 따름. (c) 룰 평가 내부 예외 → 해당 룰만 격리 실패(<code>info</code> 진단 Finding), 다른 룰·게이트는 계속(순수 함수라 격리 가능). (d) 스키마 검증 실패(authority 부재 등) → fail-closed, exit 2. <strong>어떤 경우에도 침묵 통과(false pass) 금지.</strong></li>
+</ul>
+<hr>
+<h2 id="8-기술-스택-배포" class="hd"><a class="anchor" href="#8-기술-스택-배포" aria-label="anchor">#</a>8. 기술 스택 &amp; 배포</h2>
+<table>
+<thead>
+<tr>
+<th>영역</th>
+<th>선택</th>
+<th>정당화</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>언어/런타임</td>
+<td><strong>TypeScript + Node, pnpm 모노레포</strong></td>
+<td>린터/컴파일러 계열 도구라 AST·DOM 생태계가 Node 집중. IR을 단일 <code>@sb/ir-schema</code> 패키지 타입으로 전 모듈 공유 → 경계 드리프트 컴파일타임 차단. axe-core·Playwright 1급</td>
+</tr>
+<tr>
+<td>패키지 경계</td>
+<td><code>@sb/ir-schema</code>, <code>@sb/adapters/*</code>, <code>@sb/lift</code>, <code>@sb/normalize</code>, <code>@sb/promoter</code>, <code>@sb/contract-binder</code>, <code>@sb/rules/*</code>, <code>@sb/engine</code>, <code>@sb/cli</code>, <code>@sb/report</code>, (2단계) <code>@sb/eval-server</code></td>
+<td>패키지 경계 = 아키텍처 경계. 어댑터·룰 추가가 코어 무변경. NORMALIZE·ContractBinder가 명시 패키지로 분리되어 책임 단일화</td>
+</tr>
+<tr>
+<td>런타임 DOM</td>
+<td><strong>Playwright (Chromium headless)</strong></td>
+<td>마운트 후 DOM·접근성 트리·계산 대비비·실 포커스 순서 동시 확보(제약 C). axe-core 주입. scenarios[] 복수 상태. 컨텍스트 재사용으로 성능 예산 충족</td>
+</tr>
+<tr>
+<td>정적 파싱(보조)</td>
+<td>TS Compiler API / SWC</td>
+<td>tsx-static 어댑터. 미해소=unknown</td>
+</tr>
+<tr>
+<td>IR 검증</td>
+<td><strong>Zod (런타임 검증) + 파생 TS 타입</strong></td>
+<td>외부 아티팩트 다루므로 런타임 검증 필수. fail-closed(authority 부재 거부)를 스키마 검증에서 강제</td>
+</tr>
+<tr>
+<td>접근성 엔진</td>
+<td><strong>axe-core</strong> (NORMALIZE가 facts[]로 정규화)</td>
+<td>검증된 룰 재사용. 1단계 5규칙 빠르게. target→nodeId 매핑은 §3.4 규약</td>
+</tr>
+<tr>
+<td>1단계 배포</td>
+<td><strong>npm 패키지 + CLI</strong>, CI에서 <code>npx</code></td>
+<td>인프라 0. 데모·온보딩 최속(출하 우선)</td>
+</tr>
+<tr>
+<td>2단계 배포</td>
+<td>CLI → <code>@sb/eval-server</code>(컨테이너)로 IR POST(레닥션 후), Violation 수신 + Postgres + WORM</td>
+<td>룰 IP 서버측 격리(제약 F). 해시체인 감사 검증 활성. 인터페이스 동일</td>
+</tr>
+<tr>
+<td>저장/감사</td>
+<td>1단계 Git+JSON(prevHash 체인 형성) → 2단계 Postgres(룰셋·Run·계약카탈로그) + object storage(WORM, 체인 검증)</td>
+<td>YAGNI: 1단계 DB 불필요. 감사 스키마·체인 규약은 1일차 고정</td>
+</tr>
+</tbody>
+</table>
+<p><strong>의식적 비선택(1단계 금지)</strong>: 마이크로서비스·메시지 큐·k8s·그래프 DB·룰 DSL/GUI·자체 정적 React 파서·멀티리전. 모두 국소 추가라 인터페이스만 비워두면 충분. 1단계 Run은 수초~수십초 동기 처리로 족하다.</p>
+<hr>
+<h2 id="9-단계별-진화-매핑-1-2-3단계-빌드-순서" class="hd"><a class="anchor" href="#9-단계별-진화-매핑-1-2-3단계-빌드-순서" aria-label="anchor">#</a>9. 단계별 진화 매핑 (1/2/3단계 빌드 순서)</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>1단계 (0~3M) — 데모</th>
+<th>2단계 (3~9M) — CI 게이트</th>
+<th>3단계 (9M~) — 해자</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>어댑터</strong></td>
+<td><code>dom-snapshot</code> 1종</td>
+<td>+ <code>fhir-questionnaire</code>, <code>tsx-static</code></td>
+<td>추가 표준 어댑터</td>
+</tr>
+<tr>
+<td><strong>Capture/LIFT</strong></td>
+<td>runtime-dom Capture + LIFT, scenarios[], 결정적 nodeId</td>
+<td>declarative/ast LIFT 경로</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>NORMALIZE</strong></td>
+<td>axe→facts 매핑(§3.4)</td>
+<td>+ 추가 엔진</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>IR</strong></td>
+<td>L1+L2 채움, <strong>L3·계약슬롯 정의만(빈)</strong></td>
+<td>binding 활성(폐쇄형/계약), 단위·코드 슬롯 소비</td>
+<td><strong>L3 의료 주석 채움</strong></td>
+</tr>
+<tr>
+<td><strong>Promoter</strong></td>
+<td>DOM 휴리스틱 + confidence/status</td>
+<td>+ FHIR 어댑테이션 훅(명시적 시맨틱)</td>
+<td>도메인 컨셉 매핑</td>
+</tr>
+<tr>
+<td><strong>ContractBinder</strong></td>
+<td>단계 존재(빈 카탈로그, 전부 unknown)</td>
+<td>카탈로그 활성, scope→contract 승격</td>
+<td>계약 권위 L3 결합</td>
+</tr>
+<tr>
+<td><strong>규칙</strong></td>
+<td>접근성 5(axe 래핑)</td>
+<td>+ 일관성·데이터정합성(폐쇄형→계약)</td>
+<td>+ 규제·안전(L3), 룰 축적</td>
+</tr>
+<tr>
+<td><strong>게이트/dedup</strong></td>
+<td>exit-code 계약 고정, scenarios dedup, status-gating</td>
+<td>+ SARIF·게이트 활성·staged rollout</td>
+<td>+ break-glass 인가·tenant 정책</td>
+</tr>
+<tr>
+<td><strong>룰저장소</strong></td>
+<td>Git+manifest, 버전·authority·prevHash 체인 형성</td>
+<td>Postgres·승인워크플로·체인 검증·서버측 평가·PHI 레닥션</td>
+<td>IP 해자·온프레미스 평가 노드</td>
+</tr>
+<tr>
+<td><strong>테넌시</strong></td>
+<td>tenantId 타입 박힘·합성함수 존재(단일 사용)</td>
+<td>멀티테넌트 격리 활성</td>
+<td>tenant별 룰 오버라이드 거버넌스</td>
+</tr>
+<tr>
+<td><strong>그대로 둠</strong></td>
+<td>—</td>
+<td>IR 스키마, 어댑터/LIFT/Normalize/Promoter/Binder/규칙 IF, 게이트·exit-code, dedup, 감사 스키마·체인 규약</td>
+<td>위 전부 + 1·2단계 규칙</td>
+</tr>
+</tbody>
+</table>
+<p><strong>무재작업 빌드 순서</strong>: (1) <code>@sb/ir-schema</code> 동결(결정적 nodeId·status·contract 슬롯 포함) → (2) <code>dom-snapshot</code> Capture + LIFT → (3) NORMALIZE(axe→facts) → (4) Semantic Promoter(1순위 리스크, confidence/status 강제) → (5) ContractBinder(빈 카탈로그 통과) → (6) 접근성 5규칙 + 엔진 + effectiveSeverity(status-gating) → (7) DEDUP → (8) CLI 리포트 + fail-closed 검증 + exit-code 계약 → (9) 감사 레코드(prevHash 체인). 이 순서로 1단계 출하.</p>
+<hr>
+<h2 id="10-핵심-설계-결정-adr-트레이드오프" class="hd"><a class="anchor" href="#10-핵심-설계-결정-adr-트레이드오프" aria-label="anchor">#</a>10. 핵심 설계 결정 (ADR) &amp; 트레이드오프</h2>
+<p><strong>ADR-1 — A를 골격 기반으로, C의 책임경계·층화를 1일차 접목 (하이브리드 정당화)</strong></p>
+<ul>
+<li>결정: 무재작업 구조가 세 안 동등하므로 1단계 출하속도 최강인 A를 골격으로. C가 1단계로 당긴 인프라(별도 Capture <em>구현</em>, tenant 격리 실물, 해시체인 저장)는 A식 규율로 2단계 유보하되, <strong>필드/훅만 추가하면 되는 저비용·고가치 두 가지</strong>(전역 fail-closed authority, Capture/LIFT 층화)는 1일차 접목.</li>
+<li>대안: C 전면 기반(렌즈2·3) / A 순수(렌즈1). 근거: C 전면은 1단계 데모 속도 손실, A 순수는 SaMD 방어 코드강제 부족 + 어댑터 누수. 하이브리드가 교집합.</li>
+<li>트레이드오프: 하이브리드 통합 비용. 그러나 접목분이 전부 &quot;스키마 필드/인터페이스 훅&quot;이라 구현 부담 최소.</li>
+</ul>
+<p><strong>ADR-2 — 어댑터=Capture만, L1은 LIFT가 생성 (C에서 접목)</strong></p>
+<ul>
+<li>결정: <code>capture()→CaptureResult</code>, 별도 <code>lift()→L1</code>. 대안: A/B의 <code>buildL1=어댑터 책임</code>.</li>
+<li>근거: 어댑터=L1생성이면 <code>contrastRatio</code>/<code>a11y</code>가 조건부 필드가 되어 어댑터 물성이 L1 스키마로 누수, 규칙이 '미측정'과 '통과'를 구분 못 함. Capture 한 겹이 봉인, <code>Measured&lt;T&gt;.measured</code>로 구분 1급화.</li>
+<li>트레이드오프: 변환 단계 +1. 정보 부재는 <code>measured</code> 플래그로 규칙 레벨 구분.</li>
+</ul>
+<p><strong>ADR-3 — 규칙은 순수 함수, 외부 계약은 ContractBinder가 IR에 주입 (A + 검토 high-2 교정)</strong></p>
+<ul>
+<li>결정: 규칙은 IR·facts만 읽고 I/O 금지(<code>requires</code> 미충족 자동 skip). <strong>계약 스키마 주입은 Promoter가 아니라 전용 <code>ContractBinder</code> 단계</strong>가 <code>contractCatalog</code>를 읽어 <code>binding.contract</code>를 채운다(§3.6).</li>
+<li>대안(기각): v1처럼 Promoter가 계약 주입 — Promoter는 UI 관측 책임이라 외부 계약 결합과 혼재하면 단일 책임 붕괴 + <code>promote()</code> 시그니처에 카탈로그가 없어 <em>구현 불가</em>였다(검토 지적).</li>
+<li>근거: 재현성(감사) + 테스트성 + 2단계 서버측 IP 격리 인터페이스 변경 0(제약 F). 계약 조회 I/O는 BIND 단계(미리 로드된 카탈로그)로 격리해 규칙 순수성 유지.</li>
+<li>트레이드오프: 파이프라인 단계 +1(BIND). 책임 분리 대가로 수용.</li>
+</ul>
+<p><strong>ADR-4 — 전역 fail-closed: authority 없는 판정 출력 금지 (C에서, 양보 불가)</strong></p>
+<ul>
+<li>결정: <code>Violation.authority</code> 필수, 스키마 검증에서 부재 시 거부. 차단 정책은 <code>tenantPolicy</code> 소유.</li>
+<li>근거: 제약 E — SaMD/CDSS 사정권 회피의 사업 존립 조건. 런타임 규약/문서 약속으로는 부족, 컴파일·검증 단 fail-closed로 강제. 나중에 못 끼워넣는 결정.</li>
+<li>트레이드오프: 1단계 접근성 룰도 authority(WCAG 인용) 박는 보일러플레이트. 비용 무시 가능, 가치 결정적.</li>
+</ul>
+<p><strong>ADR-5 — confidence + status 게이팅: 추론·미상으로 차단 금지 (C에서, 검토 high-1로 강화)</strong></p>
+<ul>
+<li>결정: effectiveSeverity가 <code>confidence</code>뿐 아니라 **<code>status</code>(unknown/ambiguous)**까지 1급 입력으로 받고, 룰별 <code>unknownPolicy</code>(skip/demote/report)로 동작을 선언한다. <strong>게이트 차단 조건 = status known ∧ confidence≥floor ∧ rollout=block</strong> (§4.4 불변식).</li>
+<li>대안(기각): v1처럼 confidence만 — <code>status:ambiguous ∧ confidence≥floor</code> 노드의 차단이 미정의였고 P6이 게이트에 도달 못 함(검토 high-1).</li>
+<li>근거: 제약 E·B — 추론/미상으로 배포를 막으면 (a) 오탐 신뢰붕괴, (b) SaMD 오인, (c) unknown≠null 원칙이 게이트에서 무력화. 이를 단일 함수로 강제.</li>
+<li>트레이드오프: 일부 진짜 위반을 경고/제거로 강등(놓칠 위험). staged rollout·위양성 라벨링과 직교 결합해 보완.</li>
+</ul>
+<p><strong>ADR-6 — unknown ≠ null 타입 분리 + 단일 ir-schema 패키지 (B에서)</strong></p>
+<ul>
+<li>결정: <code>TriBool</code>/<code>status</code> 1급. <code>irSchemaVersion</code> 박고 전 모듈이 <code>@sb/ir-schema</code> 공유. 대안: null로 미상 표현 / 모듈별 자체 타입.</li>
+<li>근거: 정적 파서가 못 푼 props 분기를 false로 단정하면 거짓 통과/위반. 타입 레벨 차단 + 게이트 전파(ADR-5)로 이중 강제. 단일 패키지가 경계 드리프트 컴파일타임 차단.</li>
+<li>트레이드오프: 모델 verbosity·전 패키지 재컴파일. 핵심 정합성 자산이라 수용.</li>
+</ul>
+<p><strong>ADR-7 — IR L1/L2/L3 다층, L3 1단계 빈 배열로 출하</strong></p>
+<ul>
+<li>결정: 세 레이어 별도 그래프, nodeId 결합. L3는 1단계 <code>[]</code>. provenance/confidence/status 공통 1급.</li>
+<li>근거: 빈 레이어 비용 0, 평면 트리 쪼개기 비용은 전 규칙 재작성. <code>requires:['l3']</code> 자동 skip이 1·3단계 공존 보장.</li>
+<li>트레이드오프: 1단계 개발자가 안 쓰는 레이어 학습. 문서로 상쇄.</li>
+</ul>
+<p><strong>ADR-8 — 런타임 DOM 스냅샷 1차 + MountSpec 비결정성 봉인 + scenarios[] (A+C)</strong></p>
+<ul>
+<li>결정: Playwright 마운트 1차, 정적 보조. <code>MountSpec</code>(seed/fixtures/waitFor) + scenarios<a href="%EB%B9%88%ED%8F%BC/%EA%B2%80%EC%A6%9D%EC%97%90%EB%9F%AC/%EB%A1%9C%EB%94%A9"></a>.</li>
+<li>근거: 제약 C — 동적성·대비비·포커스·axe 재사용 동시 해결. MountSpec가 비결정성(1순위 운영 실패모드) 봉인 → 재현성=감사성. scenarios[]가 상태폭발 사각 대응.</li>
+<li>트레이드오프: 실행 가능 아티팩트(URL/번들) 전제, 마운트 비용. scenario 간 Finding 합성은 §3.7로 명세 완료(v1 미해결 항목 해소).</li>
+</ul>
+<p><strong>ADR-9 — 결정적 nodeId를 조인/dedup/스냅샷의 단일 키로 동결 (검토 high-3)</strong></p>
+<ul>
+<li>결정: <code>nodeId = layer:sha1(tenantId‖stablePath)</code> — 시나리오 불변 <code>stablePath</code> 시드. 교차 시나리오·재실행 안정성을 §3.2.1로 규약화.</li>
+<li>대안(기각): v1의 무규약 nodeId — 생성·안정성 미정의로 결정성·골든 스냅샷·dedup이 모두 무너졌다(검토 high-3).</li>
+<li>근거: nodeId는 L1↔L2↔L3 결합, §3.7 dedup, §7.3 골든 스냅샷의 유일한 부하 지지 키. 비결정 시 전 하위 시스템 붕괴.</li>
+<li>트레이드오프: 안정 앵커 없는 노드는 인덱스 의존 경로(취약) — <code>pathStability:'index-only'</code>로 표기해 검토자가 식별.</li>
+</ul>
+<p><strong>ADR-10 — exit-code 계약·prevHash 체인·tenant 합성을 1일차 동결 (검토 medium 일괄 해소)</strong></p>
+<ul>
+<li>결정: exit 0/1/2 의미(§5.2), prevHash 체인 동작(§6.2.1), 룰셋 합성 함수(§6.4)를 1단계부터 <em>동작하는</em> 형태로 고정(빈 필드·미래 약속 아님).</li>
+<li>근거: 이 셋은 &quot;스키마만 박고 미루면&quot; 2단계에 CI 워크플로 재작성(exit-code)·감사 호환성 붕괴(prevHash)·테넌트 리팩토링(합성)을 부른다. 동작 자체가 가벼워 1일차 비용이 거의 0이므로 미룰 이유가 없다.</li>
+<li>트레이드오프: 1단계가 단일 tenant라 합성·체인이 자명하게 동작하나, 규약을 미리 고정하는 약간의 선행 설계. 무재작업 대가로 수용.</li>
+</ul>
+<hr>
+<h2 id="11-리스크-미해결-질문" class="hd"><a class="anchor" href="#11-리스크-미해결-질문" aria-label="anchor">#</a>11. 리스크 &amp; 미해결 질문</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>리스크/질문</th>
+<th>영향</th>
+<th>대응/현 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>R1</strong></td>
+<td><strong>L1→L2 Semantic Promoter가 진짜 1단계 롱폴 리스크</strong> (off-the-shelf 불가, day-1 필수, confidence/status 값의 출처)</td>
+<td>1단계 출하 지연 가능</td>
+<td>§3.5 알고리즘·confidence/status 산출 명세, 어댑테이션 훅. <strong>1순위 격상</strong> — 가장 먼저·집중 구현</td>
+</tr>
+<tr>
+<td><strong>R2</strong></td>
+<td>scenarios[] 간 Finding 합성/dedup</td>
+<td>리포트 중복/혼선</td>
+<td><strong>해소(검토 반영).</strong> §3.7에 <code>(ruleId, stableNodeKey)</code> dedup·evidence 합성·심각도 최댓값 규약 명세, 1단계 적용</td>
+</tr>
+<tr>
+<td><strong>R3</strong></td>
+<td>정적 경로 측정 부재 전파 (<code>measured:false</code>)</td>
+<td>정적 어댑터에서 접근성 룰 부분맹</td>
+<td><code>Measured&lt;T&gt;.measured</code>+§4.7 <code>coverage-gap</code> Finding으로 게이트·리포트에서 명시. 런타임 권장 우회</td>
+</tr>
+<tr>
+<td><strong>R4</strong></td>
+<td>fail-closed가 운영 초기 위양성으로 과도 차단</td>
+<td>신뢰 붕괴</td>
+<td>shadow→warn→block rollout + 위양성 라벨링(§5.1) 피드백. 신규 룰 무조건 shadow 시작 강제</td>
+</tr>
+<tr>
+<td><strong>R5</strong></td>
+<td>런타임 마운트 불가 아티팩트</td>
+<td>일부 입력 검증 불가</td>
+<td><code>CaptureResult{ok:false}</code>→exit 2(§5.2) 명시 구분. tsx-static 보조 + unknown 표기</td>
+</tr>
+<tr>
+<td><strong>R6</strong></td>
+<td>서버측 평가 시 IR 생성 경계 이동 + PHI 유출</td>
+<td>IR 동등성/기밀성</td>
+<td><strong>결정:</strong> IR 생성은 항상 명시 경계, <code>inputDigest</code>+골든 IR 스냅샷으로 동등성 고정. 서버 업로드 전 PHI 레닥션(§6.3)</td>
+</tr>
+<tr>
+<td><strong>R7</strong></td>
+<td>UCUM/LOINC/RxNorm 코드체계 데이터 출처·라이선스</td>
+<td>3단계 계약기반 정합성</td>
+<td><strong>미해결.</strong> 3단계 진입 전 코드체계 라이선스·갱신 전략 + ContractCatalog 공급 채널 확정 필요</td>
+</tr>
+<tr>
+<td><strong>R8</strong></td>
+<td>해시체인 감사의 키 관리·서명 인프라</td>
+<td>법적 무결성 보증</td>
+<td>prevHash 체인은 1일차 형성(§6.2.1), WORM·자동검증·서명키(HSM 여부) 2단계 확정</td>
+</tr>
+<tr>
+<td><strong>R9</strong></td>
+<td>tenant 룰 오버라이드 충돌·승인 워크플로</td>
+<td>3단계 멀티테넌트 거버넌스</td>
+<td>합성 함수·우선순위(tenant 우선)는 1일차 고정(§6.4). 승인 워크플로 UI는 3단계 설계</td>
+</tr>
+<tr>
+<td><strong>R10</strong></td>
+<td>위양성 라벨이 자동 rollout 강등을 유발할 임계 정책</td>
+<td>룰 품질 자동화</td>
+<td><strong>미해결.</strong> 위양성률 임계·자동 shadow 강등 정책은 2단계 운영 데이터로 확정</td>
+</tr>
+</tbody>
+</table>
+<h3 id="한-줄-요약" class="hd"><a class="anchor" href="#한-줄-요약" aria-label="anchor">#</a>한 줄 요약</h3>
+<p><strong>A의 출하속도 골격 위에, C의 책임경계(전역 fail-closed authority·confidence+status 게이팅)와 층화(Capture/LIFT·NORMALIZE·scenarios·ContractBinder)를 &quot;필드·단계·훅&quot;으로 1일차 접목하고, B의 타입 규율(unknown≠null·단일 ir-schema)을 흡수했다.</strong> 적대적 검토가 지적한 횡단 실행계약 공백 — status가 게이트까지 못 닿던 fail-closed, 주입 경로 없던 계약 정합성, 규약 없던 nodeId, 모순된 Promoter↔facts 순서, 미뤄둔 dedup·exit-code·prevHash·tenant 합성 — 을 전부 메우되, 모든 보강이 &quot;스키마 필드/파이프라인 단계/결정적 규약&quot; 추가라 인터페이스 동결 원칙을 깨지 않는다. 미래 비용은 스키마/인터페이스에 1일차 투자해 막고, 현재 비용은 인프라를 2단계로 미룬다 — 빈 L3, 순수함수 룰(서버화 예약), 바인딩·계약 슬롯(데이터정합성 예약), 심각도/rollout 분리(거버넌스 예약), 어댑터=Capture(입력확장 예약), tenantId 타입강제+합성함수(멀티테넌트 예약), authority 필수(SaMD 방어), prevHash 체인(감사 무결성 예약). 이 경계들이 1→3단계 무재작업을 물리적으로 보증하고, 진짜 1단계 롱폴 리스크인 Semantic Promoter를 1순위로 격상해 명세했다.</p>
+
+      <div class="foot">소프트보울 내부 설계 문서 · 의료용 AI 생성물 검증·거버넌스 솔루션 · 전체 시스템 아키텍처(확정본) · architecture-final.md 기반</div>
+    </article>
+  </main>
+</div>
+<script>
+// wrap tables for horizontal scroll
+document.querySelectorAll('article table').forEach(function(t){
+  if(t.parentElement.classList.contains('tbl-wrap'))return;
+  var w=document.createElement('div');w.className='tbl-wrap';
+  t.parentNode.insertBefore(w,t);w.appendChild(t);
+});
+// mobile sidebar toggle
+var sb=document.getElementById('sidebar'),sc=document.getElementById('scrim'),mb=document.getElementById('menuBtn');
+function toggle(o){sb.classList.toggle('open',o);sc.classList.toggle('open',o);}
+mb&&mb.addEventListener('click',function(){toggle(!sb.classList.contains('open'));});
+sc&&sc.addEventListener('click',function(){toggle(false);});
+sb&&sb.addEventListener('click',function(e){if(e.target.classList.contains('toc-item'))toggle(false);});
+// scrollspy
+var items=[].slice.call(document.querySelectorAll('.toc-item'));
+var map={};items.forEach(function(a){map[a.getAttribute('href').slice(1)]=a;});
+var heads=[].slice.call(document.querySelectorAll('article h2.hd,article h3.hd'));
+var obs=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){
+      items.forEach(function(a){a.classList.remove('active');});
+      var a=map[e.target.id];if(a){a.classList.add('active');
+        a.scrollIntoView({block:'nearest'});}
+    }
+  });
+},{rootMargin:'-56px 0px -75% 0px',threshold:0});
+heads.forEach(function(h){obs.observe(h);});
+</script>
+</body>
+</html>
