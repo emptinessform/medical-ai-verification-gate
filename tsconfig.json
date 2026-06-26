@@ -1,6 +1,7 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/ir-schema" }
+    { "path": "packages/ir-schema" },
+    { "path": "packages/lift" }
   ]
 }
