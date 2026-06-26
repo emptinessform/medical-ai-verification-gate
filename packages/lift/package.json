@@ -1,0 +1,13 @@
+{
+  "name": "@sb/lift",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@sb/ir-schema": "workspace:*",
+    "jsdom": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.0.0"
+  }
+}
