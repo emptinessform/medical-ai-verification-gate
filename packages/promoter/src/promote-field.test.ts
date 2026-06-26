@@ -38,6 +38,11 @@ describe('resolveLabel', () => {
     const input = n('l1:i', 'input', { 'aria-labelledby': 'missing' });
     expect(resolveLabel(input, graph(input))).toEqual({ label: null, confidence: 0.6, ambiguous: true });
   });
+  it('returns ambiguous when a matching label element exists but has no captured text', () => {
+    const input = n('l1:i', 'input', { id: 'drug' });
+    const label = n('l1:l', 'label', { for: 'drug' }); // no text (nested in a child, not captured)
+    expect(resolveLabel(input, graph(label, input))).toEqual({ label: null, confidence: 0.6, ambiguous: true });
+  });
 });
 
 describe('resolveRequired', () => {

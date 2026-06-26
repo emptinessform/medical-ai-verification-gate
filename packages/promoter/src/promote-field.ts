@@ -14,7 +14,12 @@ export function resolveLabel(
     const label = Object.values(l1.nodes).find(
       (x) => x.tag.toLowerCase() === 'label' && x.attributes['for'] === id,
     );
-    if (label?.text) return { label: label.text, confidence: 0.95, ambiguous: false };
+    if (label) {
+      if (label.text) return { label: label.text, confidence: 0.95, ambiguous: false };
+      // label element present but its text was not captured (e.g. nested in a child) —
+      // present-but-unreadable is NOT confirmed-absent
+      return { label: null, confidence: 0.6, ambiguous: true };
+    }
   }
   // aria-label (0.9)
   const aria = field.attributes['aria-label'];

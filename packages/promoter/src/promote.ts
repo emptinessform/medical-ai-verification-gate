@@ -66,7 +66,13 @@ export function promote(args: {
   for (const f of forms) {
     const fieldIds = collectDescendants(f.l1, l1, fieldL2);
     const actionIds = collectDescendants(f.l1, l1, actionL2);
-    const meta = metaFor(f.l1, tenantId, FIELD_KIND_CONFIDENCE, false);
+    const childIds = [...fieldIds, ...actionIds];
+    const children = childIds
+      .map((cid) => overlays.find((o) => o.nodeId === cid))
+      .filter((o): o is NonNullable<typeof o> => Boolean(o));
+    const ambiguous = children.some((c) => c.status === 'ambiguous');
+    const confidence = Math.min(FIELD_KIND_CONFIDENCE, ...children.map((c) => c.confidence));
+    const meta = metaFor(f.l1, tenantId, confidence, ambiguous);
     overlays.push({ ...meta, kind: 'Form', fields: fieldIds, actions: actionIds });
   }
 

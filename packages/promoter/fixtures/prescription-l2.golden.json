@@ -8,8 +8,8 @@
       "captureId": "r",
       "scenarioId": "empty"
     },
-    "confidence": 0.95,
-    "status": "known",
+    "confidence": 0.5,
+    "status": "ambiguous",
     "derivedFrom": [
       "l1:b12632402cf6"
     ],
