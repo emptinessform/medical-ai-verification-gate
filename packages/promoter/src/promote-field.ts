@@ -1,5 +1,7 @@
 import type { L1Node, L1Graph, TriBool } from '@sb/ir-schema';
 
+type DataType = 'string' | 'number' | 'date' | 'code' | 'quantity' | 'boolean' | 'unknown';
+
 const UNCERTAIN_CONFIDENCE = 0.5;
 
 export function resolveLabel(
@@ -50,7 +52,7 @@ export function resolveRequired(
   return { required: 'unknown', confidence: UNCERTAIN_CONFIDENCE, ambiguous: true };
 }
 
-const TYPE_MAP: Record<string, string> = {
+const TYPE_MAP: Record<string, DataType> = {
   number: 'number', range: 'number',
   date: 'date', 'datetime-local': 'date', month: 'date', week: 'date', time: 'date',
   checkbox: 'boolean',
@@ -59,7 +61,7 @@ const TYPE_MAP: Record<string, string> = {
 
 export function resolveDataType(
   field: L1Node,
-): { dataType: string; confidence: number; ambiguous: boolean } {
+): { dataType: DataType; confidence: number; ambiguous: boolean } {
   // <select> is always an enumeration / code picker
   if (field.tag.toLowerCase() === 'select') {
     return { dataType: 'code', confidence: 0.85, ambiguous: false };

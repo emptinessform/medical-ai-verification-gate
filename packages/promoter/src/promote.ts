@@ -51,7 +51,7 @@ export function promote(args: {
       const meta = metaFor(node, tenantId, confidence, ambiguous);
       fieldL2[node.nodeId] = meta.nodeId;
       overlays.push({ ...meta, kind: 'Field', label: lbl.label, required: req.required,
-        dataType: dt.dataType as any, ...(binding ? { binding } : {}) });
+        dataType: dt.dataType, ...(binding ? { binding } : {}) });
     } else if (kind === 'Action') {
       const role = resolveActionRole(node, l1);
       const meta = metaFor(node, tenantId, Math.min(0.95, role.confidence), role.ambiguous);
