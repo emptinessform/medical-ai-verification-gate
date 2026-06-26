@@ -60,6 +60,10 @@ const TYPE_MAP: Record<string, string> = {
 export function resolveDataType(
   field: L1Node,
 ): { dataType: string; confidence: number; ambiguous: boolean } {
+  // <select> is always an enumeration / code picker
+  if (field.tag.toLowerCase() === 'select') {
+    return { dataType: 'code', confidence: 0.85, ambiguous: false };
+  }
   const type = field.attributes['type'];
   if (type && TYPE_MAP[type]) {
     return { dataType: TYPE_MAP[type], confidence: 0.9, ambiguous: false };
