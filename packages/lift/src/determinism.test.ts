@@ -31,6 +31,8 @@ describe('determinism', () => {
     const ir = liftHtml(args);
     for (const id of Object.keys(ir.l1.nodes)) {
       expect(id).toMatch(/^l1:[0-9a-f]{12}$/);
+      // Join-key invariant: embedded nodeId must equal its map key.
+      expect(ir.l1.nodes[id].nodeId).toBe(id);
     }
   });
 });

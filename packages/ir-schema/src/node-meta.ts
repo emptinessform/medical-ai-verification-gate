@@ -3,7 +3,7 @@ import { NodeStatus } from './scalars.js';
 
 export const Provenance = z.object({
   source: z.union([
-    z.object({ file: z.string(), line: z.number(), col: z.number() }),
+    z.object({ file: z.string(), line: z.number().int(), col: z.number().int() }),
     z.object({ domPath: z.string() }),
   ]),
   captureId: z.string(),

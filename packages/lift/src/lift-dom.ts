@@ -15,16 +15,37 @@ interface LiftArgs {
 const unmeasured = () => ({ value: null, measured: false });
 
 export function liftHtml(args: LiftArgs) {
-  const { html, tenantId, runId, scenarioId, ruleSetPin } = args;
+  const { html: rawHtml, tenantId, runId, scenarioId, ruleSetPin } = args;
+  // Normalize line endings once; used for both JSDOM parse and digest so the
+  // hash is identical regardless of CRLF vs LF checkout (FIX C).
+  const html = rawHtml.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const dom = new JSDOM(`<body>${html}</body>`);
   const doc = dom.window.document;
   const captureId = runId;
+
+  // FIX B: require exactly one top-level element — never silently drop siblings.
+  const root = doc.body.firstElementChild;
+  if (!root) {
+    throw new Error('liftHtml: input html contains no element node to lift');
+  }
+  if (doc.body.children.length > 1) {
+    throw new Error(
+      `liftHtml: expected exactly one root element, got ${doc.body.children.length}`,
+    );
+  }
 
   const nodes: Record<string, L1Node> = {};
 
   function visit(el: Element): string {
     const { path, indexOnly } = stablePath(el);
     const id = makeNodeId('l1', tenantId, path);
+
+    // FIX A hard safety guard: duplicate nodeId means a stablePath collision
+    // that the disambiguation above failed to prevent — fail loudly.
+    if (nodes[id]) {
+      throw new Error(`liftHtml: duplicate nodeId ${id} — stablePath collision`);
+    }
+
     const attributes: Record<string, string> = {};
     for (const a of Array.from(el.attributes)) attributes[a.name] = a.value;
 
@@ -59,10 +80,6 @@ export function liftHtml(args: LiftArgs) {
     return id;
   }
 
-  const root = doc.body.firstElementChild;
-  if (!root) {
-    throw new Error('liftHtml: input html contains no element node to lift');
-  }
   const rootId = visit(root);
 
   return IR.parse({

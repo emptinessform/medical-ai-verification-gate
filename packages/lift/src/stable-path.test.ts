@@ -60,4 +60,13 @@ describe('stablePath', () => {
     expect(r.path).toBe('body>div[2]>input[name=a]');
     expect(r.indexOnly).toBe(true);
   });
+
+  it('disambiguates sibling inputs that share the same name attribute', () => {
+    const dom = new JSDOM('<body><form><input name="sex" value="m"/><input name="sex" value="f"/></form></body>');
+    const inputs = Array.from(dom.window.document.querySelectorAll('input'));
+    const paths = inputs.map((inp) => stablePath(inp).path);
+    expect(paths[0]).not.toBe(paths[1]);
+    expect(paths[0]).toMatch(/\[1\]$/);
+    expect(paths[1]).toMatch(/\[2\]$/);
+  });
 });

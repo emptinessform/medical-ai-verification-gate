@@ -35,4 +35,21 @@ describe('liftHtml', () => {
   it('throws a clear error when the html has no element', () => {
     expect(() => liftHtml({ ...args, html: '   ' })).toThrow(/no element/);
   });
+
+  it('throws when html has multiple root elements', () => {
+    expect(() => liftHtml({ ...args, html: '<div></div><div></div>' })).toThrow(
+      /expected exactly one root/,
+    );
+  });
+
+  it('lifts both inputs in a radio group to distinct nodes', () => {
+    const ir = liftHtml({
+      ...args,
+      html: '<form><input name="sex" value="m"/><input name="sex" value="f"/></form>',
+    });
+    const inputNodes = Object.values(ir.l1.nodes).filter((n) => n.tag === 'input');
+    expect(inputNodes.length).toBe(2);
+    const nodeIds = inputNodes.map((n) => n.nodeId);
+    expect(nodeIds[0]).not.toBe(nodeIds[1]);
+  });
 });
