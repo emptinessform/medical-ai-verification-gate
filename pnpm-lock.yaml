@@ -34,6 +34,15 @@ importers:
         specifier: ^21.0.0
         version: 21.1.7
 
+  packages/promoter:
+    dependencies:
+      '@sb/ir-schema':
+        specifier: workspace:*
+        version: link:../ir-schema
+      '@sb/lift':
+        specifier: workspace:*
+        version: link:../lift
+
 packages:
 
   '@asamuzakjp/css-color@3.2.0':

@@ -1,0 +1,10 @@
+{
+  "name": "@sb/promoter",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@sb/ir-schema": "workspace:*",
+    "@sb/lift": "workspace:*"
+  }
+}
