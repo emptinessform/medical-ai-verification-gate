@@ -1,0 +1,7 @@
+{
+  "name": "@sb/report",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": { "@sb/ir-schema": "workspace:*", "zod": "^3.23.0" }
+}

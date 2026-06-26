@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "packages/ir-schema" },
+    { "path": "packages/report" },
     { "path": "packages/lift" },
     { "path": "packages/promoter" },
     { "path": "packages/normalize" },

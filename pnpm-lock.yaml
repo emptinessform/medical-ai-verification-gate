@@ -81,6 +81,15 @@ importers:
         specifier: workspace:*
         version: link:../lift
 
+  packages/report:
+    dependencies:
+      '@sb/ir-schema':
+        specifier: workspace:*
+        version: link:../ir-schema
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+
   packages/rules:
     dependencies:
       '@sb/ir-schema':
