@@ -3,6 +3,7 @@
   "references": [
     { "path": "packages/ir-schema" },
     { "path": "packages/lift" },
-    { "path": "packages/promoter" }
+    { "path": "packages/promoter" },
+    { "path": "packages/normalize" }
   ]
 }

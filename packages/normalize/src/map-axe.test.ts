@@ -1,0 +1,69 @@
+import { describe, it, expect } from 'vitest';
+import { JSDOM } from 'jsdom';
+import { mapAxeResults, type AxeOutput } from './map-axe.js';
+
+function doc(html: string): Document {
+  return new JSDOM(`<body>${html}</body>`).window.document;
+}
+const opts = { tenantId: 'hosp-A', scenarioId: 'empty', engine: 'axe-core@4.x' };
+
+describe('mapAxeResults', () => {
+  it('maps a violation to a fact joined to the targeted L1 nodeId', () => {
+    const d = doc('<form><input id="dose"/></form>');
+    const axe: AxeOutput = {
+      violations: [{ id: 'label', impact: 'serious',
+        nodes: [{ target: ['#dose'], any: [{ data: { accessibleName: '' } }] }] }],
+      incomplete: [],
+    };
+    const facts = mapAxeResults(axe, d, opts);
+    expect(facts).toHaveLength(1);
+    expect(facts[0].ruleId).toBe('label');
+    expect(facts[0].impact).toBe('serious');
+    expect(facts[0].measurable).toBe(true);
+    expect(facts[0].observed).toEqual({ accessibleName: '' });
+    expect(facts[0].appliesTo).toMatch(/^l1:[0-9a-f]{12}$/);
+  });
+
+  it('preserves incomplete results (no silent drop) with observed.result', () => {
+    const d = doc('<form><button id="b">저장</button></form>');
+    const axe: AxeOutput = {
+      violations: [],
+      incomplete: [{ id: 'color-contrast', impact: null,
+        nodes: [{ target: ['#b'], any: [{ data: { fgColor: '#bbb' } }] }] }],
+    };
+    const facts = mapAxeResults(axe, d, opts);
+    expect(facts).toHaveLength(1);
+    expect(facts[0].ruleId).toBe('color-contrast');
+    expect(facts[0].impact).toBe('moderate'); // null impact defaults to moderate
+    expect(facts[0].observed).toEqual({ result: 'incomplete', fgColor: '#bbb' });
+  });
+
+  it('splits a selector matching multiple nodes into separate facts', () => {
+    const d = doc('<form><input class="x"/><input class="x"/></form>');
+    const axe: AxeOutput = {
+      violations: [{ id: 'label', impact: 'serious', nodes: [{ target: ['.x'] }] }],
+      incomplete: [],
+    };
+    const facts = mapAxeResults(axe, d, opts);
+    expect(facts).toHaveLength(2);
+    expect(facts[0].appliesTo).not.toBe(facts[1].appliesTo);
+  });
+
+  it('is deterministic and sorted by (appliesTo, ruleId)', () => {
+    const d = doc('<form><input id="dose"/></form>');
+    const axe: AxeOutput = {
+      violations: [{ id: 'label', impact: 'serious', nodes: [{ target: ['#dose'] }] }],
+      incomplete: [],
+    };
+    expect(JSON.stringify(mapAxeResults(axe, d, opts))).toBe(JSON.stringify(mapAxeResults(axe, d, opts)));
+  });
+
+  it('uses the last selector in a nested target array', () => {
+    const d = doc('<form><input id="dose"/></form>');
+    const axe: AxeOutput = {
+      violations: [{ id: 'label', impact: 'minor', nodes: [{ target: ['#frame', '#dose'] }] }],
+      incomplete: [],
+    };
+    expect(mapAxeResults(axe, d, opts)).toHaveLength(1);
+  });
+});

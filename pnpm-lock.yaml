@@ -34,6 +34,22 @@ importers:
         specifier: ^21.0.0
         version: 21.1.7
 
+  packages/normalize:
+    dependencies:
+      '@sb/ir-schema':
+        specifier: workspace:*
+        version: link:../ir-schema
+      '@sb/lift':
+        specifier: workspace:*
+        version: link:../lift
+    devDependencies:
+      '@types/jsdom':
+        specifier: ^21.0.0
+        version: 21.1.7
+      jsdom:
+        specifier: ^24.0.0
+        version: 24.1.3
+
   packages/promoter:
     dependencies:
       '@sb/ir-schema':
